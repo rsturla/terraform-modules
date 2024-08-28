@@ -14,7 +14,6 @@ resource "aws_vpc" "this" {
 }
 
 resource "aws_internet_gateway" "this" {
-  count  = var.create_igw ? 1 : 0
   vpc_id = aws_vpc.this.id
 
   tags = merge(
@@ -32,11 +31,9 @@ resource "aws_default_route_table" "default" {
 }
 
 resource "aws_route" "default_ipv4_internet" {
-  count = var.create_igw ? 1 : 0
-
   route_table_id         = aws_default_route_table.default.id
   destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.this[0].id
+  gateway_id             = aws_internet_gateway.this.id
 
   depends_on = [
     aws_internet_gateway.this,
@@ -45,12 +42,9 @@ resource "aws_route" "default_ipv4_internet" {
 }
 
 resource "aws_route" "default_ipv6_internet" {
-  # Although IPv6 does not use the Internet Gateway, we assume we want the same behavior as IPv4
-  count = var.create_igw ? 1 : 0
-
   route_table_id              = aws_default_route_table.default.id
   destination_ipv6_cidr_block = "::/0"
-  gateway_id                  = aws_internet_gateway.this[0].id
+  gateway_id                  = aws_internet_gateway.this.id
 
   depends_on = [
     aws_internet_gateway.this,

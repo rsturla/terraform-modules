@@ -29,7 +29,7 @@ resource "aws_route_table" "private_persistence" {
 }
 
 resource "aws_route" "private_persistence_nat" {
-  count = length(data.aws_availability_zones.all.names)
+  count = var.allow_private_persistence_internet_access ? length(data.aws_availability_zones.all.names) : 0
 
   route_table_id         = element(aws_route_table.private_persistence.*.id, count.index)
   destination_cidr_block = "0.0.0.0/0"

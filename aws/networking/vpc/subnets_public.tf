@@ -33,11 +33,11 @@ resource "aws_route_table" "public" {
 }
 
 resource "aws_route" "internet" {
-  count = var.create_igw ? length(data.aws_availability_zones.all.names) : 0
+  count = length(data.aws_availability_zones.all.names)
 
   route_table_id         = aws_route_table.public[count.index].id
   destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.this[0].id
+  gateway_id             = aws_internet_gateway.this.id
 
   depends_on = [
     aws_internet_gateway.this,
@@ -46,11 +46,11 @@ resource "aws_route" "internet" {
 }
 
 resource "aws_route" "ipv6_default_gateway" {
-  count = var.create_igw ? length(data.aws_availability_zones.all.names) : 0
+  count = length(data.aws_availability_zones.all.names)
 
   route_table_id              = aws_route_table.public[count.index].id
   destination_ipv6_cidr_block = "::/0"
-  gateway_id                  = aws_internet_gateway.this[0].id
+  gateway_id                  = aws_internet_gateway.this.id
 
   depends_on = [
     aws_internet_gateway.this,
