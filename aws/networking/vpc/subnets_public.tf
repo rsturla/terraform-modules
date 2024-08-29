@@ -9,6 +9,8 @@ resource "aws_subnet" "public" {
     "AZ-${count.index}",
     cidrsubnet(var.cidr_block, var.public_subnet_bits, count.index),
   )
+
+  enable_dns64 = true
   ipv6_cidr_block = lookup(
     var.public_subnet_ipv6_cidr_blocks,
     "AZ-${count.index}",
