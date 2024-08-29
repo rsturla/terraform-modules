@@ -71,7 +71,10 @@ jobs:
 
       - name: Validate
         env:
-          excluded_directories: ""
+          # Some modules (especially those using multiple providers) do not work with `terraform validate`
+          # so we exclude them from the validation process
+          excluded_directories: |
+            modules/aws/security/securityhub
         run: |
           excluded_dirs=($excluded_directories)
           for dir in $MODULE_DIRS; do
