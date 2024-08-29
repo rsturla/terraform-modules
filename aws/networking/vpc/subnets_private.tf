@@ -53,7 +53,7 @@ resource "aws_route" "private_app_egress_only_internet_gateway" {
 
   route_table_id              = aws_route_table.private_app[count.index].id
   destination_ipv6_cidr_block = "::/0"
-  gateway_id                  = aws_egress_only_internet_gateway.this.id
+  egress_only_gateway_id      = aws_egress_only_internet_gateway.this.id
 
   depends_on = [
     aws_egress_only_internet_gateway.this,
