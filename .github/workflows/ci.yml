@@ -66,6 +66,7 @@ jobs:
       - name: Initialize
         working-directory: ${{ matrix.module }}
         run: |
+          ls -la
           for dir in $MODULE_DIRS; do
             pushd $dir
             terraform init
