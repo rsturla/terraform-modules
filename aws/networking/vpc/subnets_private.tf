@@ -32,7 +32,7 @@ resource "aws_route_table" "private_app" {
   )
 }
 
-resource "aws_route" "nat" {
+resource "aws_route" "private_app_nat" {
   count = length(data.aws_availability_zones.all.names)
 
   route_table_id         = aws_route_table.private_app[count.index].id
@@ -42,6 +42,19 @@ resource "aws_route" "nat" {
 
   depends_on = [
     aws_internet_gateway.this,
+    aws_route_table.private_app,
+  ]
+}
+
+resource "aws_route" "private_app_egress_only_internet_gateway" {
+  count = length(data.aws_availability_zones.all.names)
+
+  route_table_id              = aws_route_table.private_app[count.index].id
+  destination_ipv6_cidr_block = "::/0"
+  gateway_id                  = aws_egress_only_internet_gateway.this.id
+
+  depends_on = [
+    aws_egress_only_internet_gateway.this,
     aws_route_table.private_app,
   ]
 }

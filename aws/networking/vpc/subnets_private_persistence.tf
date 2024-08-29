@@ -46,6 +46,19 @@ resource "aws_route" "private_persistence_nat" {
   ]
 }
 
+resource "aws_route" "private_persistence_egress_only_internet_gateway" {
+  count = var.allow_private_persistence_internet_access ? length(data.aws_availability_zones.all.names) : 0
+
+  route_table_id              = aws_route_table.private_persistence[count.index].id
+  destination_ipv6_cidr_block = "::/0"
+  gateway_id                  = aws_egress_only_internet_gateway.this.id
+
+  depends_on = [
+    aws_egress_only_internet_gateway.this,
+    aws_route_table.private_persistence,
+  ]
+}
+
 resource "aws_route_table_association" "private_persistence" {
   count = length(data.aws_availability_zones.all.names)
 
