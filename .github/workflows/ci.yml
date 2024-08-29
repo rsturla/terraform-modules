@@ -75,6 +75,7 @@ jobs:
           # so we exclude them from the validation process
           excluded_directories: |
             modules/aws/security/securityhub
+            modules/aws/security/inspector
         run: |
           excluded_dirs=($excluded_directories)
           for dir in $MODULE_DIRS; do
