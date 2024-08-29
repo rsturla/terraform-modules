@@ -7,7 +7,12 @@ resource "aws_subnet" "private_app" {
   cidr_block = lookup(
     var.private_app_subnet_cidr_blocks,
     "AZ-${count.index}",
-    cidrsubnet(var.cidr_block, var.private_subnet_bits, count.index),
+    cidrsubnet(var.cidr_block, var.private_app_subnet_bits, count.index + local.private_app_subnet_spacing)
+  )
+  ipv6_cidr_block = lookup(
+    var.private_app_subnet_ipv6_cidr_blocks,
+    "AZ-${count.index}",
+    cidrsubnet(aws_vpc.this.ipv6_cidr_block, var.ipv6_subnet_bits, count.index + local.private_app_subnet_spacing)
   )
 
   tags = merge(

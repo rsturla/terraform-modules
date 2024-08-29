@@ -8,7 +8,12 @@ resource "aws_subnet" "private_persistence" {
   cidr_block = lookup(
     var.private_persistence_subnet_cidr_blocks,
     "AZ-${count.index}",
-    cidrsubnet(var.cidr_block, var.private_persistence_subnet_bits, count.index + var.private_persistence_spacing),
+    cidrsubnet(var.cidr_block, var.private_persistence_subnet_bits, count.index + local.private_peristence_subnet_spacing),
+  )
+  ipv6_cidr_block = lookup(
+    var.private_persistence_subnet_ipv6_cidr_blocks,
+    "AZ-${count.index}",
+    cidrsubnet(aws_vpc.this.ipv6_cidr_block, var.ipv6_subnet_bits, count.index + local.private_peristence_subnet_spacing),
   )
 
   tags = merge(
