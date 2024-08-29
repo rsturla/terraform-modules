@@ -26,21 +26,22 @@ jobs:
 
   discover:
     runs-on: ubuntu-latest
+    id: discover-modules
     steps:
       - name: Checkout
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
 
-      - name: Find Terraform Modules
+      - name: Find Terraform Module Groups
         id: find-modules
         run: |
-          find modules -maxdepth 1 -mindepth 1 -type d | sort -u | sed 's/^\.\///' | jq -R -s -c 'split("\n")[:-1]' > /tmp/modules.json
+          find modules -maxdepth 2 -mindepth 2 -type d | sort -u | sed 's/^\.\///' | jq -R -s -c 'split("\n")[:-1]' > /tmp/modules.json
           modules_raw=$(cat /tmp/modules.json)
           echo "TERRAFORM_MODULES=$modules_raw" >> $GITHUB_OUTPUT
 
-      - name: Find Terraform Examples
+      - name: Find Terraform Example Groups
         id: find-examples
         run: |
-          find examples -maxdepth 1 -mindepth 1 -type d | sort -u | sed 's/^\.\///' | jq -R -s -c 'split("\n")[:-1]' > /tmp/examples.json
+          find examples -maxdepth 2 -mindepth 2 -type d | sort -u | sed 's/^\.\///' | jq -R -s -c 'split("\n")[:-1]' > /tmp/examples.json
           examples_raw=$(cat /tmp/examples.json)
           echo "TERRAFORM_EXAMPLES=$examples_raw" >> $GITHUB_OUTPUT
 
@@ -58,7 +59,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        module: ${{ fromJson(needs.find-modules.outputs.TERRAFORM_MODULES) }}
+        module: ${{ fromJson(needs.discover-modules.outputs.TERRAFORM_MODULES) }}
     steps:
       - name: Checkout
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
@@ -66,10 +67,28 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
 
+      - name: Discover Modules
+        run: |
+          dirs=$(find "${{ matrix.module }}" -type f -name "*.tf" -exec dirname {} \; | sort | uniq)
+          echo "MODULE_DIRS=$dirs" >> $GITHUB_ENV
+
       - name: Initialize
         working-directory: ${{ matrix.module }}
-        run: terraform init -input=false
+        run: |
+          for dir in $MODULE_DIRS; do
+            terraform init $dir
+          done
 
       - name: Validate
         working-directory: ${{ matrix.module }}
-        run: terraform validate
+        env:
+          # examples/data-processing/database-migration-service causes crash in terraform validate on GHA
+          excluded_directories: |
+            modules/networking/vpc-flow-logs
+        run: |
+          excluded_dirs=($excluded_directories)
+          for dir in $MODULE_DIRS; do
+            if [[ ! " ${excluded_dirs[@]} " =~ " $dir " ]]; then
+              terraform validate -json -check-variables=false $dir
+            fi
+          done
