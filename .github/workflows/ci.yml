@@ -23,3 +23,45 @@ jobs:
 
       - name: Format
         run: terraform fmt -recursive -check
+
+  discover:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+
+      - name: Find Terraform Modules
+        id: find-modules
+        run: |
+          find modules -maxdepth 1 -mindepth 1 -type d | sort -u | sed 's/^\.\///' | jq -R -s -c 'split("\n")[:-1]' > /tmp/modules.json
+          modules_raw=$(cat /tmp/modules.json)
+          echo "TERRAFORM_MODULES=$modules_raw" >> $GITHUB_OUTPUT
+
+      - name: Find Terraform Examples
+        id: find-examples
+        run: |
+          find examples -maxdepth 1 -mindepth 1 -type d | sort -u | sed 's/^\.\///' | jq -R -s -c 'split("\n")[:-1]' > /tmp/examples.json
+          examples_raw=$(cat /tmp/examples.json)
+          echo "TERRAFORM_EXAMPLES=$examples_raw" >> $GITHUB_OUTPUT
+
+  validate-modules:
+    runs-on: ubuntu-latest
+    needs: discover
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ${{ fromJson(needs.find-modules.outputs.TERRAFORM_MODULES) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
+
+      - name: Initialize
+        working-directory: ${{ matrix.module }}
+        run: terraform init -input=false
+
+      - name: Validate
+        working-directory: ${{ matrix.module }}
+        run: terraform validate
