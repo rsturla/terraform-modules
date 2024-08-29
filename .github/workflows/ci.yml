@@ -60,7 +60,7 @@ jobs:
 
       - name: Discover Modules
         run: |
-          dirs=$(find "${{ matrix.module }}" -type f -name "*.tf" -exec dirname {} \; | sort | uniq)
+          dirs=$(find "${{ matrix.module }}" -type f -name "*.tf" -exec dirname {} \; | sort | uniq | tr '\n' ' ')
           echo "MODULE_DIRS=$dirs" >> $GITHUB_ENV
 
       - name: Initialize
