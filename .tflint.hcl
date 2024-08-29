@@ -2,7 +2,7 @@ config {
   format     = "compact"
   plugin_dir = "~/.tflint.d/plugins"
 
-  module              = true
+  call_module_type    = "local"
   force               = false
   disabled_by_default = false
 
