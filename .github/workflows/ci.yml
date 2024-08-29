@@ -67,7 +67,9 @@ jobs:
         working-directory: ${{ matrix.module }}
         run: |
           for dir in $MODULE_DIRS; do
-            terraform init $dir
+            pushd $dir
+            terraform init
+            popd
           done
 
       - name: Validate
@@ -80,6 +82,8 @@ jobs:
           excluded_dirs=($excluded_directories)
           for dir in $MODULE_DIRS; do
             if [[ ! " ${excluded_dirs[@]} " =~ " $dir " ]]; then
-              terraform validate -json -check-variables=false $dir
+              pushd $dir
+              terraform validate
+              popd
             fi
           done
