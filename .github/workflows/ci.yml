@@ -44,6 +44,14 @@ jobs:
           examples_raw=$(cat /tmp/examples.json)
           echo "TERRAFORM_EXAMPLES=$examples_raw" >> $GITHUB_OUTPUT
 
+      - name: Display Terraform Modules
+        run: |
+          echo "Terraform Modules:"
+          echo "${{ steps.find-modules.outputs.TERRAFORM_MODULES }}"
+
+          echo "Terraform Examples:"
+          echo "${{ steps.find-examples.outputs.TERRAFORM_EXAMPLES }}"
+
   validate-modules:
     runs-on: ubuntu-latest
     needs: discover
