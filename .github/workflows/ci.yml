@@ -24,25 +24,20 @@ jobs:
       - name: Format
         run: terraform fmt -recursive -check
 
-  discover:
+  batch:
     runs-on: ubuntu-latest
     outputs:
-      TERRAFORM_MODULES: ${{ steps.find-modules.outputs.TERRAFORM_MODULES }}
+      MODULE_GROUPS: ${{ steps.find-modules.outputs.MODULE_GROUPS }}
     steps:
       - name: Checkout
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
 
-      - name: Find Terraform Module Groups
-        id: find-modules
+      - name: Split Modules into Groups
+        id: find-module-groups
         run: |
           find modules examples -maxdepth 2 -mindepth 2 -type d | sort -u | sed 's/^\.\///' | jq -R -s -c 'split("\n")[:-1]' > /tmp/modules.json
           modules_raw=$(cat /tmp/modules.json)
-          echo "TERRAFORM_MODULES=$modules_raw" >> $GITHUB_OUTPUT
-
-      - name: Display Terraform Modules
-        run: |
-          echo "Terraform Modules:"
-          echo "${{ steps.find-modules.outputs.TERRAFORM_MODULES }}"
+          echo "MODULE_GROUPS=$modules_raw" >> $GITHUB_OUTPUT
 
   validate-modules:
     runs-on: ubuntu-latest
@@ -50,7 +45,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        module: ${{ fromJson(needs.discover.outputs.TERRAFORM_MODULES) }}
+        MODULE_GROUPS: ${{ fromJson(needs.batch.outputs.MODULE_GROUPS) }}
     steps:
       - name: Checkout
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
@@ -58,9 +53,12 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
 
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+
       - name: Discover Modules
         run: |
-          dirs=$(find "${{ matrix.module }}" -type f -name "*.tf" -exec dirname {} \; | sort | uniq | tr '\n' ' ')
+          dirs=$(find "${{ matrix.MODULE_GROUPS }}" -type f -name "*.tf" -exec dirname {} \; | sort | uniq | tr '\n' ' ')
           echo "MODULE_DIRS=$dirs" >> $GITHUB_ENV
 
       - name: Initialize
@@ -83,3 +81,9 @@ jobs:
               popd
             fi
           done
+
+      - name: Lint
+        working-directory: ${{ matrix.MODULE_DIRS }}
+        run: |
+          tflint --init
+          tflint --config .tflint.hcl --recursive
