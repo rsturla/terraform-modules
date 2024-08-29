@@ -5,7 +5,6 @@ module "inspector_{{ $region }}" {
   source = "./single-region"
 
   create_resources    = contains(var.opt_in_regions, "{{ index $.Regions $index }}")
-  is_aggregate_region = var.aggregate_region == "{{ index $.Regions $index }}"
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -15,5 +14,9 @@ module "inspector_{{ $region }}" {
   providers = {
     aws = aws.{{ $region }}
   }
+
+  depends_on = [
+    aws_inspector2_organization_configuration.this
+  ]
 }
 {{- end }}

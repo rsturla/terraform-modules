@@ -23,7 +23,6 @@ resource "aws_inspector2_member_association" "enable" {
   account_id = each.key
 
   depends_on = [
-    aws_inspector2_organization_configuration.this,
     aws_inspector2_enabler.enable,
   ]
 }

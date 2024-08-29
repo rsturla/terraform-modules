@@ -3,7 +3,6 @@ module "inspector_us_east_1" {
   source = "./single-region"
 
   create_resources    = contains(var.opt_in_regions, "us-east-1")
-  is_aggregate_region = var.aggregate_region == "us-east-1"
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -13,12 +12,15 @@ module "inspector_us_east_1" {
   providers = {
     aws = aws.us_east_1
   }
+
+  depends_on = [
+    aws_inspector2_organization_configuration.this
+  ]
 }
 module "inspector_us_east_2" {
   source = "./single-region"
 
   create_resources    = contains(var.opt_in_regions, "us-east-2")
-  is_aggregate_region = var.aggregate_region == "us-east-2"
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -28,12 +30,15 @@ module "inspector_us_east_2" {
   providers = {
     aws = aws.us_east_2
   }
+
+  depends_on = [
+    aws_inspector2_organization_configuration.this
+  ]
 }
 module "inspector_us_west_1" {
   source = "./single-region"
 
   create_resources    = contains(var.opt_in_regions, "us-west-1")
-  is_aggregate_region = var.aggregate_region == "us-west-1"
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -43,12 +48,15 @@ module "inspector_us_west_1" {
   providers = {
     aws = aws.us_west_1
   }
+
+  depends_on = [
+    aws_inspector2_organization_configuration.this
+  ]
 }
 module "inspector_us_west_2" {
   source = "./single-region"
 
   create_resources    = contains(var.opt_in_regions, "us-west-2")
-  is_aggregate_region = var.aggregate_region == "us-west-2"
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -58,12 +66,15 @@ module "inspector_us_west_2" {
   providers = {
     aws = aws.us_west_2
   }
+
+  depends_on = [
+    aws_inspector2_organization_configuration.this
+  ]
 }
 module "inspector_ap_south_1" {
   source = "./single-region"
 
   create_resources    = contains(var.opt_in_regions, "ap-south-1")
-  is_aggregate_region = var.aggregate_region == "ap-south-1"
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -73,12 +84,15 @@ module "inspector_ap_south_1" {
   providers = {
     aws = aws.ap_south_1
   }
+
+  depends_on = [
+    aws_inspector2_organization_configuration.this
+  ]
 }
 module "inspector_ap_northeast_1" {
   source = "./single-region"
 
   create_resources    = contains(var.opt_in_regions, "ap-northeast-1")
-  is_aggregate_region = var.aggregate_region == "ap-northeast-1"
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -88,12 +102,15 @@ module "inspector_ap_northeast_1" {
   providers = {
     aws = aws.ap_northeast_1
   }
+
+  depends_on = [
+    aws_inspector2_organization_configuration.this
+  ]
 }
 module "inspector_ap_northeast_2" {
   source = "./single-region"
 
   create_resources    = contains(var.opt_in_regions, "ap-northeast-2")
-  is_aggregate_region = var.aggregate_region == "ap-northeast-2"
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -103,12 +120,15 @@ module "inspector_ap_northeast_2" {
   providers = {
     aws = aws.ap_northeast_2
   }
+
+  depends_on = [
+    aws_inspector2_organization_configuration.this
+  ]
 }
 module "inspector_ap_southeast_1" {
   source = "./single-region"
 
   create_resources    = contains(var.opt_in_regions, "ap-southeast-1")
-  is_aggregate_region = var.aggregate_region == "ap-southeast-1"
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -118,12 +138,15 @@ module "inspector_ap_southeast_1" {
   providers = {
     aws = aws.ap_southeast_1
   }
+
+  depends_on = [
+    aws_inspector2_organization_configuration.this
+  ]
 }
 module "inspector_ap_southeast_2" {
   source = "./single-region"
 
   create_resources    = contains(var.opt_in_regions, "ap-southeast-2")
-  is_aggregate_region = var.aggregate_region == "ap-southeast-2"
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -133,12 +156,15 @@ module "inspector_ap_southeast_2" {
   providers = {
     aws = aws.ap_southeast_2
   }
+
+  depends_on = [
+    aws_inspector2_organization_configuration.this
+  ]
 }
 module "inspector_ap_northeast_3" {
   source = "./single-region"
 
   create_resources    = contains(var.opt_in_regions, "ap-northeast-3")
-  is_aggregate_region = var.aggregate_region == "ap-northeast-3"
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -148,12 +174,15 @@ module "inspector_ap_northeast_3" {
   providers = {
     aws = aws.ap_northeast_3
   }
+
+  depends_on = [
+    aws_inspector2_organization_configuration.this
+  ]
 }
 module "inspector_ca_central_1" {
   source = "./single-region"
 
   create_resources    = contains(var.opt_in_regions, "ca-central-1")
-  is_aggregate_region = var.aggregate_region == "ca-central-1"
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -163,12 +192,15 @@ module "inspector_ca_central_1" {
   providers = {
     aws = aws.ca_central_1
   }
+
+  depends_on = [
+    aws_inspector2_organization_configuration.this
+  ]
 }
 module "inspector_eu_central_1" {
   source = "./single-region"
 
   create_resources    = contains(var.opt_in_regions, "eu-central-1")
-  is_aggregate_region = var.aggregate_region == "eu-central-1"
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -178,12 +210,15 @@ module "inspector_eu_central_1" {
   providers = {
     aws = aws.eu_central_1
   }
+
+  depends_on = [
+    aws_inspector2_organization_configuration.this
+  ]
 }
 module "inspector_eu_west_1" {
   source = "./single-region"
 
   create_resources    = contains(var.opt_in_regions, "eu-west-1")
-  is_aggregate_region = var.aggregate_region == "eu-west-1"
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -193,12 +228,15 @@ module "inspector_eu_west_1" {
   providers = {
     aws = aws.eu_west_1
   }
+
+  depends_on = [
+    aws_inspector2_organization_configuration.this
+  ]
 }
 module "inspector_eu_west_2" {
   source = "./single-region"
 
   create_resources    = contains(var.opt_in_regions, "eu-west-2")
-  is_aggregate_region = var.aggregate_region == "eu-west-2"
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -208,12 +246,15 @@ module "inspector_eu_west_2" {
   providers = {
     aws = aws.eu_west_2
   }
+
+  depends_on = [
+    aws_inspector2_organization_configuration.this
+  ]
 }
 module "inspector_eu_west_3" {
   source = "./single-region"
 
   create_resources    = contains(var.opt_in_regions, "eu-west-3")
-  is_aggregate_region = var.aggregate_region == "eu-west-3"
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -223,12 +264,15 @@ module "inspector_eu_west_3" {
   providers = {
     aws = aws.eu_west_3
   }
+
+  depends_on = [
+    aws_inspector2_organization_configuration.this
+  ]
 }
 module "inspector_eu_north_1" {
   source = "./single-region"
 
   create_resources    = contains(var.opt_in_regions, "eu-north-1")
-  is_aggregate_region = var.aggregate_region == "eu-north-1"
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -238,12 +282,15 @@ module "inspector_eu_north_1" {
   providers = {
     aws = aws.eu_north_1
   }
+
+  depends_on = [
+    aws_inspector2_organization_configuration.this
+  ]
 }
 module "inspector_sa_east_1" {
   source = "./single-region"
 
   create_resources    = contains(var.opt_in_regions, "sa-east-1")
-  is_aggregate_region = var.aggregate_region == "sa-east-1"
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -253,4 +300,8 @@ module "inspector_sa_east_1" {
   providers = {
     aws = aws.sa_east_1
   }
+
+  depends_on = [
+    aws_inspector2_organization_configuration.this
+  ]
 }
