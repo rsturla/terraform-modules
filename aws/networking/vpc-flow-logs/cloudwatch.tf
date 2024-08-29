@@ -1,7 +1,7 @@
 resource "aws_cloudwatch_log_group" "logs" {
   count = local.enable_cloudwatch_destination ? 1 : 0
 
-  name_prefix       = "${var.name}-flow-logs"
+  name              = "/aws/vpc/${var.name}-flow-logs"
   retention_in_days = var.cloudwatch_log_retention_in_days
 
   tags = var.tags_all
