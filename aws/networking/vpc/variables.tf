@@ -120,6 +120,18 @@ variable "create_vpc_endpoints" {
   default     = true
 }
 
+variable "flow_log_traffic_type" {
+  description = "The type of traffic to capture. Valid values: ACCEPT, REJECT, ALL."
+  type        = string
+  default     = "ALL"
+}
+
+variable "flow_log_cloudwatch_log_retention_in_days" {
+  description = "The number of days to retain log events in CloudWatch Logs."
+  type        = number
+  default     = 14
+}
+
 variable "tags_all" {
   description = "A map of tags to add to all resources created by this module"
   type        = map(string)
