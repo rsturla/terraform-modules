@@ -8,7 +8,6 @@ module "securityhub_{{ $region }}" {
   standards                          = var.enabled_standards
   external_member_accounts           = var.external_member_accounts
   delegated_administrator_account_id = var.delegated_administrator_account_id
-  is_aggregate_region                = var.aggregate_region == "{{ index $.Regions $index }}"
 
   providers = {
     aws = aws.{{ $region }}
