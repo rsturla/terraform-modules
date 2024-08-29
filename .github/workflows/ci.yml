@@ -86,4 +86,4 @@ jobs:
         working-directory: ${{ matrix.MODULE_DIRS }}
         run: |
           tflint --init
-          tflint --config .tflint.hcl --recursive
+          tflint --config ${{ github.workspace }}/.tflint.hcl
