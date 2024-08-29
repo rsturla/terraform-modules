@@ -2,7 +2,7 @@
 module "inspector_us_east_1" {
   source = "./single-region"
 
-  create_resources    = contains(var.opt_in_regions, "us-east-1")
+  create_resources = contains(var.opt_in_regions, "us-east-1")
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -20,7 +20,7 @@ module "inspector_us_east_1" {
 module "inspector_us_east_2" {
   source = "./single-region"
 
-  create_resources    = contains(var.opt_in_regions, "us-east-2")
+  create_resources = contains(var.opt_in_regions, "us-east-2")
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -38,7 +38,7 @@ module "inspector_us_east_2" {
 module "inspector_us_west_1" {
   source = "./single-region"
 
-  create_resources    = contains(var.opt_in_regions, "us-west-1")
+  create_resources = contains(var.opt_in_regions, "us-west-1")
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -56,7 +56,7 @@ module "inspector_us_west_1" {
 module "inspector_us_west_2" {
   source = "./single-region"
 
-  create_resources    = contains(var.opt_in_regions, "us-west-2")
+  create_resources = contains(var.opt_in_regions, "us-west-2")
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -74,7 +74,7 @@ module "inspector_us_west_2" {
 module "inspector_ap_south_1" {
   source = "./single-region"
 
-  create_resources    = contains(var.opt_in_regions, "ap-south-1")
+  create_resources = contains(var.opt_in_regions, "ap-south-1")
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -92,7 +92,7 @@ module "inspector_ap_south_1" {
 module "inspector_ap_northeast_1" {
   source = "./single-region"
 
-  create_resources    = contains(var.opt_in_regions, "ap-northeast-1")
+  create_resources = contains(var.opt_in_regions, "ap-northeast-1")
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -110,7 +110,7 @@ module "inspector_ap_northeast_1" {
 module "inspector_ap_northeast_2" {
   source = "./single-region"
 
-  create_resources    = contains(var.opt_in_regions, "ap-northeast-2")
+  create_resources = contains(var.opt_in_regions, "ap-northeast-2")
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -128,7 +128,7 @@ module "inspector_ap_northeast_2" {
 module "inspector_ap_southeast_1" {
   source = "./single-region"
 
-  create_resources    = contains(var.opt_in_regions, "ap-southeast-1")
+  create_resources = contains(var.opt_in_regions, "ap-southeast-1")
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -146,7 +146,7 @@ module "inspector_ap_southeast_1" {
 module "inspector_ap_southeast_2" {
   source = "./single-region"
 
-  create_resources    = contains(var.opt_in_regions, "ap-southeast-2")
+  create_resources = contains(var.opt_in_regions, "ap-southeast-2")
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -164,7 +164,7 @@ module "inspector_ap_southeast_2" {
 module "inspector_ap_northeast_3" {
   source = "./single-region"
 
-  create_resources    = contains(var.opt_in_regions, "ap-northeast-3")
+  create_resources = contains(var.opt_in_regions, "ap-northeast-3")
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -182,7 +182,7 @@ module "inspector_ap_northeast_3" {
 module "inspector_ca_central_1" {
   source = "./single-region"
 
-  create_resources    = contains(var.opt_in_regions, "ca-central-1")
+  create_resources = contains(var.opt_in_regions, "ca-central-1")
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -200,7 +200,7 @@ module "inspector_ca_central_1" {
 module "inspector_eu_central_1" {
   source = "./single-region"
 
-  create_resources    = contains(var.opt_in_regions, "eu-central-1")
+  create_resources = contains(var.opt_in_regions, "eu-central-1")
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -218,7 +218,7 @@ module "inspector_eu_central_1" {
 module "inspector_eu_west_1" {
   source = "./single-region"
 
-  create_resources    = contains(var.opt_in_regions, "eu-west-1")
+  create_resources = contains(var.opt_in_regions, "eu-west-1")
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -236,7 +236,7 @@ module "inspector_eu_west_1" {
 module "inspector_eu_west_2" {
   source = "./single-region"
 
-  create_resources    = contains(var.opt_in_regions, "eu-west-2")
+  create_resources = contains(var.opt_in_regions, "eu-west-2")
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -254,7 +254,7 @@ module "inspector_eu_west_2" {
 module "inspector_eu_west_3" {
   source = "./single-region"
 
-  create_resources    = contains(var.opt_in_regions, "eu-west-3")
+  create_resources = contains(var.opt_in_regions, "eu-west-3")
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -272,7 +272,7 @@ module "inspector_eu_west_3" {
 module "inspector_eu_north_1" {
   source = "./single-region"
 
-  create_resources    = contains(var.opt_in_regions, "eu-north-1")
+  create_resources = contains(var.opt_in_regions, "eu-north-1")
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
@@ -290,7 +290,7 @@ module "inspector_eu_north_1" {
 module "inspector_sa_east_1" {
   source = "./single-region"
 
-  create_resources    = contains(var.opt_in_regions, "sa-east-1")
+  create_resources = contains(var.opt_in_regions, "sa-east-1")
 
   delegated_administrator_account_id = var.delegated_administrator_account_id
   auto_enable_member_accounts        = var.auto_enable_member_accounts
