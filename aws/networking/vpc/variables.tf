@@ -8,12 +8,6 @@ variable "cidr_block" {
   type        = string
 }
 
-variable "enable_default_security_group" {
-  description = "Whether to create the default security group for the VPC.  If false, the default security group will be created but not managed by Terraform."
-  type        = bool
-  default     = false
-}
-
 variable "nat_gateway_count" {
   description = "Number of NAT Gateways to create"
   type        = number

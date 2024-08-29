@@ -58,8 +58,6 @@ resource "aws_route" "default_ipv6_internet" {
 }
 
 resource "aws_default_security_group" "default" {
-  count = var.enable_default_security_group ? 1 : 0
-
   vpc_id = aws_vpc.this.id
 
   tags = merge(
