@@ -64,7 +64,6 @@ jobs:
           echo "MODULE_DIRS=$dirs" >> $GITHUB_ENV
 
       - name: Initialize
-        working-directory: ${{ matrix.module }}
         run: |
           ls -la
           for dir in $MODULE_DIRS; do
@@ -74,7 +73,6 @@ jobs:
           done
 
       - name: Validate
-        working-directory: ${{ matrix.module }}
         env:
           # examples/data-processing/database-migration-service causes crash in terraform validate on GHA
           excluded_directories: |
