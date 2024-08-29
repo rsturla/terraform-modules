@@ -65,7 +65,6 @@ jobs:
 
       - name: Initialize
         run: |
-          ls -la
           for dir in $MODULE_DIRS; do
             pushd $dir
             terraform init
@@ -74,9 +73,7 @@ jobs:
 
       - name: Validate
         env:
-          # examples/data-processing/database-migration-service causes crash in terraform validate on GHA
-          excluded_directories: |
-            modules/networking/vpc-flow-logs
+          excluded_directories: ""
         run: |
           excluded_dirs=($excluded_directories)
           for dir in $MODULE_DIRS; do
