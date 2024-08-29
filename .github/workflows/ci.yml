@@ -26,6 +26,8 @@ jobs:
 
   discover:
     runs-on: ubuntu-latest
+    outputs:
+      TERRAFORM_MODULES: ${{ steps.find-modules.outputs.TERRAFORM_MODULES }}
     steps:
       - name: Checkout
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
@@ -33,24 +35,14 @@ jobs:
       - name: Find Terraform Module Groups
         id: find-modules
         run: |
-          find modules -maxdepth 2 -mindepth 2 -type d | sort -u | sed 's/^\.\///' | jq -R -s -c 'split("\n")[:-1]' > /tmp/modules.json
+          find modules examples -maxdepth 2 -mindepth 2 -type d | sort -u | sed 's/^\.\///' | jq -R -s -c 'split("\n")[:-1]' > /tmp/modules.json
           modules_raw=$(cat /tmp/modules.json)
           echo "TERRAFORM_MODULES=$modules_raw" >> $GITHUB_OUTPUT
-
-      - name: Find Terraform Example Groups
-        id: find-examples
-        run: |
-          find examples -maxdepth 2 -mindepth 2 -type d | sort -u | sed 's/^\.\///' | jq -R -s -c 'split("\n")[:-1]' > /tmp/examples.json
-          examples_raw=$(cat /tmp/examples.json)
-          echo "TERRAFORM_EXAMPLES=$examples_raw" >> $GITHUB_OUTPUT
 
       - name: Display Terraform Modules
         run: |
           echo "Terraform Modules:"
           echo "${{ steps.find-modules.outputs.TERRAFORM_MODULES }}"
-
-          echo "Terraform Examples:"
-          echo "${{ steps.find-examples.outputs.TERRAFORM_EXAMPLES }}"
 
   validate-modules:
     runs-on: ubuntu-latest
