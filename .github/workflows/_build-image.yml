@@ -29,6 +29,7 @@ jobs:
       registry: ${{ steps.push.outputs.registry }}
       digest: ${{ steps.push.outputs.digest }}
       unique-tag: ${{ steps.generate-metadata.outputs.UNIQUE_TAG }}
+      common-tag: ${{ steps.generate-metadata.outputs.SOURCE_TAG }}
     permissions:
       contents: read
       packages: write

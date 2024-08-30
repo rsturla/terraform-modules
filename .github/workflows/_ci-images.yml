@@ -92,3 +92,4 @@ jobs:
     uses: ./.github/workflows/_build-ami.yml
     with:
       image-spec: ${{ matrix.image-spec }}
+      image-ref: ${{ needs.build-non-base.outputs.registry }}@${{ needs.build-non-base.outputs.common-tag }}

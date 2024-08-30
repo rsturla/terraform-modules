@@ -7,6 +7,10 @@ on:
         type: string
         required: true
         description: 'The path to the image.json file'
+      image-ref:
+        type: string
+        required: true
+        description: 'The full reference to the image'
 
 jobs:
   build-ami:
@@ -34,7 +38,7 @@ jobs:
         uses: ./.github/actions/build-ami
         with:
           ami-name: ${{ steps.generate-metadata.outputs.AMI_NAME }}
-          image-ref: ${{ steps.generate-metadata.outputs.IMAGE_REGISTRY }}:latest
+          image-ref: ${{ inputs.image-ref }}
           registry: ghcr.io/${{ github.repository }}/$IMAGE_NAME
           registry-password: ${{ secrets.GITHUB_TOKEN }}
           aws-iam-role: ${{ vars.DEPLOY_IAM_ROLE }}
