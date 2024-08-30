@@ -81,3 +81,4 @@ jobs:
     uses: ./.github/workflows/_build-image.yml
     with:
       image-spec: ${{ matrix.non-base-images }}
+      base-image: ${{ needs.build-base.outputs.registry }}@${{ needs.build-base.outputs.digest }}
