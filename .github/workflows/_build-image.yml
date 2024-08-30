@@ -76,9 +76,6 @@ jobs:
           dockerfile: Containerfile
           image-name: ${{ steps.generate-metadata.outputs.IMAGE_NAME }}
           image-tags: ${{ steps.generate-metadata.outputs.TAGS }}
-          registry: ghcr.io/${{ github.repository }}
-          aws-iam-role: ${{ vars.DEPLOY_IAM_ROLE }}
-          aws-region: ${{ vars.AWS_REGION }}
           build-args: |
             ${{ inputs.base-image && format('BASE_IMAGE={0}', inputs.base-image) || '' }}
             SOURCE_TAG=${{ steps.generate-metadata.outputs.SOURCE_TAG }}

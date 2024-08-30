@@ -1,0 +1,42 @@
+name: Build AMI
+
+on:
+  workflow_call:
+    inputs:
+      image-spec:
+        type: string
+        required: true
+        description: 'The path to the image.json file'
+
+jobs:
+  build-ami:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+
+      - name: Generate AMI Metadata
+        id: generate-metadata
+        run: |
+          AMI_NAME=$(jq -r '.name' ${{ inputs.image-spec }})-$(date -u +"%Y%m%d%H%M%S")
+          echo "AMI_NAME=$AMI_NAME" >> $GITHUB_OUTPUT
+
+          IMAGE_NAME=$(jq -r '.name' ${{ inputs.image-spec }})
+          IMAGE_REGISTRY=${{ vars.IMAGE_REGISTRY }}/$IMAGE_NAME
+          echo "IMAGE_REGISTRY=$IMAGE_REGISTRY" >> $GITHUB_OUTPUT
+
+      - name: Build AMI
+        id: build
+        uses: ./.github/actions/build-ami
+        with:
+          ami-name: ${{ steps.generate-metadata.outputs.AMI_NAME }}
+          registry-aws-iam-role: ${{ vars.DEPLOY_IAM_ROLE }}
+          registry-aws-region: ${{ vars.AWS_REGION }}
+          registry: ${{ vars.IMAGE_REGISTRY }}
+          output-bucket: ${{ vars.AWS_AMI_BUCKET }}
+          image-ref: ${{ steps.generate-metadata.outputs.IMAGE_REGISTRY }}:latest
+          osbuild-config-file: ./.osbuild/config.toml
+          osbuild-output-dir: /tmp/osbuild-output

@@ -82,3 +82,13 @@ jobs:
     with:
       image-spec: ${{ matrix.non-base-images }}
       base-image: ${{ needs.build-base.outputs.registry }}@${{ needs.build-base.outputs.digest }}
+
+  build-ami:
+    needs: [build-base, build-non-base]
+    strategy:
+      fail-fast: false
+      matrix:
+        image-spec: ${{ fromJson(needs.create-matrix.outputs.base-images + needs.create-matrix.outputs.non-base-images) }}
+    uses: ./.github/workflows/_build-ami.yml
+    with:
+      image-spec: ${{ matrix.image-spec }}
