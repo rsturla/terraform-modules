@@ -19,6 +19,3 @@ jobs:
 
   images:
     uses: ./.github/workflows/_ci-images.yml
-    with:
-      # Push on all main branch pushes and manual workflow_dispatch
-      push: ${{( github.event_name == 'push' || github.event_name == 'workflow_dispatch' ) && github.ref == 'refs/heads/main'}}
