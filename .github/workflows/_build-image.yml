@@ -10,7 +10,7 @@ on:
       base-image:
         type: string
         required: false
-         description: 'The base image reference'
+        description: 'The base image reference'
     outputs:
       image-ref:
         description: 'The unique image reference'
