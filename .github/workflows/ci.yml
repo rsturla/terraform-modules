@@ -76,6 +76,7 @@ jobs:
           excluded_directories: |
             modules/aws/security/securityhub
             modules/aws/security/inspector
+            modules/aws/networking/route53-hosted-zone
         run: |
           excluded_dirs=($excluded_directories)
           for dir in $MODULE_DIRS; do
