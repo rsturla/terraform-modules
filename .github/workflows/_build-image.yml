@@ -63,9 +63,7 @@ jobs:
           fi
           echo "IS_BASE=$IS_BASE" >> $GITHUB_OUTPUT
 
-      # If IS_BASE is not true, login to GHCR
       - name: Login to GHCR
-        if: ${{ !steps.generate-metadata.outputs.IS_BASE }}
         run: echo ${{ secrets.GITHUB_TOKEN }} | podman login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Build Image
