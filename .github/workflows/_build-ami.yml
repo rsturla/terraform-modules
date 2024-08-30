@@ -14,6 +14,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
+      packages: read
     steps:
       - name: Checkout
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
@@ -33,10 +34,10 @@ jobs:
         uses: ./.github/actions/build-ami
         with:
           ami-name: ${{ steps.generate-metadata.outputs.AMI_NAME }}
-          registry-aws-iam-role: ${{ vars.DEPLOY_IAM_ROLE }}
-          registry-aws-region: ${{ vars.AWS_REGION }}
-          registry: ${{ vars.IMAGE_REGISTRY }}
-          output-bucket: ${{ vars.AWS_AMI_BUCKET }}
           image-ref: ${{ steps.generate-metadata.outputs.IMAGE_REGISTRY }}:latest
-          osbuild-config-file: ./.osbuild/config.toml
+          registry: ${{ vars.IMAGE_REGISTRY }}
+          aws-iam-role: ${{ vars.DEPLOY_IAM_ROLE }}
+          aws-region: ${{ vars.AWS_REGION }}
+          aws-output-bucket: ${{ vars.AWS_AMI_BUCKET }}
+          osbuild-config-file: ./images/.osbuild/config.toml
           osbuild-output-dir: /tmp/osbuild-output
