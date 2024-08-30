@@ -7,6 +7,10 @@ on:
         type: string
         required: true
         description: 'The path to the image.json file'
+      base-image:
+        type: string
+        required: false
+         description: 'The base image reference'
     outputs:
       image-ref:
         description: 'The unique image reference'
@@ -17,9 +21,6 @@ on:
       digest:
         description: 'The unique digest of the image'
         value: ${{ jobs.build-oci.outputs.digest }}
-      base-image:
-        description: 'The base image reference'
-        required: false
 
 jobs:
   build-oci:
