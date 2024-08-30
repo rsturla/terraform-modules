@@ -55,8 +55,8 @@ runs:
       id: configure-aws-credentials
       uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4
       with:
-        role-to-assume: ${{ inputs.registry-aws-iam-role }}
-        aws-region: ${{ inputs.registry-aws-region }}
+        role-to-assume: ${{ inputs.aws-iam-role }}
+        aws-region: ${{ inputs.aws-region }}
         output-credentials: true
 
     - name: Create AWS Credentials file
@@ -85,8 +85,8 @@ runs:
           -v /var/lib/containers/storage:/var/lib/containers/storage \
           --env-file ${{ steps.create-aws-credentials-file.outputs.CREDENTIALS_FILE }} \
           quay.io/centos-bootc/bootc-image-builder:latest \
-            --type ami --rootfs ext4 \
+            --type ami \
             --aws-ami-name ${{ inputs.ami-name }} \
-            --aws-bucket ${{ inputs.output-bucket }} \
-            --aws-region ${{ inputs.registry-aws-region }} \
+            --aws-bucket ${{ inputs.aws-output-bucket }} \
+            --aws-region ${{ inputs.aws-region }} \
             --local ${{ inputs.image-ref }}
