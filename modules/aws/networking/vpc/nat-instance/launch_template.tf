@@ -1,3 +1,16 @@
+data "aws_ami" "this" {
+  most_recent = true
+  filter {
+    name   = "image-id"
+    values = [var.ami_id]
+  }
+}
+
+locals {
+  image_tags           = data.aws_ami.this.tags
+  bootc_image_registry = lookup(local.image_tags, "bootc-image-registry", null)
+}
+
 resource "aws_network_interface" "this" {
   subnet_id         = var.subnet_id
   source_dest_check = false
@@ -13,7 +26,7 @@ resource "aws_eip" "public_ip" {
 
 resource "aws_launch_template" "this" {
   name_prefix   = var.name_prefix
-  image_id      = var.ami_id
+  image_id      = data.aws_ami.this.id
   instance_type = var.instance_type
   tags          = var.tags_all
 

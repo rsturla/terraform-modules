@@ -1,0 +1,4 @@
+{
+  "name": "aws/images/nat-instance",
+  "base": false
+}

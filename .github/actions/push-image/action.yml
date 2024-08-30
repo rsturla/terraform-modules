@@ -1,0 +1,91 @@
+name: Push Image
+
+inputs:
+  image-name:
+    description: 'The name of the image to build'
+    required: true
+  image-tags:
+    description: 'The tags to apply to the image'
+    required: true
+  image-registry:
+    description: 'The registry to push the image to'
+    required: true
+  builder:
+    description: 'The name of the builder to use (docker or podman)'
+    required: false
+    default: 'podman'
+
+outputs:
+  image-ref:
+    description: 'The full path (inc tag) to the image in the registry'
+    value: ${{ steps.set-outputs.outputs.image-ref }}
+  registry:
+    description: 'The registry the image was pushed to'
+    value: ${{ steps.set-outputs.outputs.registry }}
+  digest:
+    description: 'The digest of the image in the registry'
+    value: ${{ steps.set-outputs.outputs.digest }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Validate inputs
+      id: validate-inputs
+      shell: bash
+      run: |
+        valid_builders=("docker" "podman")
+        if [[ ! "${valid_builders[@]}" =~ "${{ inputs.builder }}" ]]; then
+          echo "Invalid builder: ${{ inputs.builder }}"
+          exit 1
+        fi
+
+    - name: Push (Podman)
+      if: ${{ inputs.builder == 'podman' }}
+      id: push-podman
+      uses: redhat-actions/push-to-registry@5ed88d269cf581ea9ef6dd6806d01562096bee9c # v2
+      with:
+        image: ${{ inputs.image-name }}
+        tags: ${{ inputs.image-tags }}
+
+    - name: Push (Docker)
+      if: ${{ inputs.builder == 'docker' }}
+      id: push-docker
+      shell: bash
+      run: |
+        docker image ls
+
+        # Convert the tags to an array
+        IFS=' ' read -ra TAGS <<< "${{ inputs.image-tags }}"
+        tags=()
+
+        # Push the image with each tag
+        for tag in "${TAGS[@]}"; do
+          image="${{ inputs.image-registry }}/${{ inputs.image-name }}:${tag}"
+          echo "IMAGE=${image}"
+          tags+=("${image}")
+          docker image tag "${{ inputs.image-name }}:${tag}" "${image}"
+          echo "Pushing image: ${image}"
+          docker image push "${image}"
+        done
+
+        digest=$(skopeo inspect docker://${tags[0]} --format '{{.Digest}}')
+
+        # Set the outputs
+        echo "image-ref=${tags[0]}" >> $GITHUB_OUTPUT
+        echo "tags=${tags[@]}" >> $GITHUB_OUTPUT
+        echo "digest=${digest}" >> $GITHUB_OUTPUT
+
+    - name: Set Outputs
+      id: set-outputs
+      shell: bash
+      env:
+        BUILDER: ${{ inputs.builder }}
+      run: |
+        echo "registry=${{ inputs.image-registry }}/${{ inputs.image-name }}" >> $GITHUB_OUTPUT
+        if [ $BUILDER == 'podman' ]; then
+          echo "image-ref=${{ steps.push-podman.outputs.registry-path }}" >> $GITHUB_OUTPUT
+          echo "digest=${{ steps.push-podman.outputs.digest }}" >> $GITHUB_OUTPUT
+        else
+          echo "image-ref=${{ steps.push-docker.outputs.registry-path }}" >> $GITHUB_OUTPUT
+          echo "digest=${{ steps.push-docker.outputs.digest }}" >> $GITHUB_OUTPUT
+        fi

@@ -2,40 +2,82 @@ name: Images CI
 
 on:
   workflow_call:
-    inputs:
-      push:
-        description: "Should push images to the registry"
-        required: true
-        default: false
-        type: boolean
 
 permissions:
   contents: read
+  id-token: write
   packages: write
 
 env:
   REGISTRY: ghcr.io/${{ github.repository }}
 
 jobs:
-  build-base:
+  create-matrix:
     runs-on: ubuntu-latest
-    env:
-      IMAGE_NAME: bootc-base
+    outputs:
+      base-images: ${{ steps.set-matrix.outputs.BASE_IMAGES }}
+      non-base-images: ${{ steps.set-matrix.outputs.NON_BASE_IMAGES }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
 
-      - name: Build Base Image
-        working-directory: ./images/aws/bootc-base
+      - name: Get Image Spec Files
+        id: get-specs
         run: |
-          podman build -f Containerfile -t bootc-base:local .
+          IMAGE_SPECS=$(find . -name image.json)
+          IMAGE_SPECS=$(echo $IMAGE_SPECS | sed 's/\.\///g')
+          echo "Found Image Specs: $IMAGE_SPECS"
 
-      - name: Tag Image
-        run: |
-          podman tag bootc-base:local $REGISTRY/$IMAGE_NAME:latest
+          BASE_IMAGES=()
+          NON_BASE_IMAGES=()
+          for IMAGE_SPEC in $IMAGE_SPECS; do
+            echo "Processing $IMAGE_SPEC"
+            if jq -e '.base' $IMAGE_SPEC > /dev/null; then
+              echo "Detected base image key in $IMAGE_SPEC"
+              if jq -e '.base == true' $IMAGE_SPEC > /dev/null; then
+                echo "Detected base image in $IMAGE_SPEC"
+                BASE_IMAGES+=($IMAGE_SPEC)
+              else
+                echo "Detected non-base image in $IMAGE_SPEC"
+                NON_BASE_IMAGES+=($IMAGE_SPEC)
+              fi
+            else
+              echo "No base image key in $IMAGE_SPEC"
+              NON_BASE_IMAGES+=($IMAGE_SPEC)
+            fi
+          done
 
-      - name: Push Image
-        if: ${{ inputs.push == true }}
+          echo "BASE_IMAGES=${BASE_IMAGES[*]}" >> $GITHUB_OUTPUT
+          echo "NON_BASE_IMAGES=${NON_BASE_IMAGES[*]}" >> $GITHUB_OUTPUT
+
+      - name: Set Matrix
+        id: set-matrix
+        env:
+          BASE_IMAGES: ${{ steps.get-specs.outputs.BASE_IMAGES }}
+          NON_BASE_IMAGES: ${{ steps.get-specs.outputs.NON_BASE_IMAGES }}
         run: |
-          echo ${{ secrets.GITHUB_TOKEN }} | podman login ghcr.io -u ${{ github.actor }} --password-stdin
-          podman push $REGISTRY/$IMAGE_NAME:latest
+          BASE_IMAGES=$(printf "%s\n" $BASE_IMAGES | jq -R -s -c 'split("\n") | .[:-1]')
+          NON_BASE_IMAGES=$(printf "%s\n" $NON_BASE_IMAGES | jq -R -s -c 'split("\n") | .[:-1]')
+
+          echo "BASE_IMAGES=$BASE_IMAGES" >> $GITHUB_OUTPUT
+          echo "NON_BASE_IMAGES=$NON_BASE_IMAGES" >> $GITHUB_OUTPUT
+
+  build-base:
+    needs: create-matrix
+    strategy:
+      fail-fast: false
+      matrix:
+        base-images: ${{ fromJson(needs.create-matrix.outputs.base-images) }}
+    uses: ./.github/workflows/_build-image.yml
+    with:
+      image-spec: ${{ matrix.base-images }}
+
+  build-non-base:
+    needs: [create-matrix, build-base]
+    strategy:
+      fail-fast: false
+      matrix:
+        non-base-images: ${{ fromJson(needs.create-matrix.outputs.non-base-images) }}
+    uses: ./.github/workflows/_build-image.yml
+    with:
+      image-spec: ${{ matrix.non-base-images }}
