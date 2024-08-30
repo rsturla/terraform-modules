@@ -36,6 +36,7 @@ jobs:
           ami-name: ${{ steps.generate-metadata.outputs.AMI_NAME }}
           image-ref: ${{ steps.generate-metadata.outputs.IMAGE_REGISTRY }}:latest
           registry: ${{ vars.IMAGE_REGISTRY }}
+          registry-password: ${{ secrets.GITHUB_TOKEN }}
           aws-iam-role: ${{ vars.DEPLOY_IAM_ROLE }}
           aws-region: ${{ vars.AWS_REGION }}
           aws-output-bucket: ${{ vars.AWS_AMI_BUCKET }}
