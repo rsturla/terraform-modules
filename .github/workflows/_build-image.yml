@@ -91,7 +91,7 @@ jobs:
           builder: docker
           image-name: ${{ steps.build.outputs.image }}
           image-tags: ${{ steps.build.outputs.tags }}
-          image-registry: ${{ vars.IMAGE_REGISTRY }}
+          image-registry: ghcr.io/${{ github.repository }}
           registry-aws-iam-role: ${{ vars.DEPLOY_IAM_ROLE }}
           registry-aws-region: ${{ vars.AWS_REGION }}
 
