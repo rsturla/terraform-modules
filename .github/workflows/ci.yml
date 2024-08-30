@@ -14,3 +14,8 @@ permissions:
 jobs:
   terraform:
     uses: ./.github/workflows/_ci-terraform.yml
+
+  images:
+    uses: ./.github/workflows/_ci-images.yml
+    with:
+      push: true
