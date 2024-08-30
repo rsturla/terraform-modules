@@ -38,6 +38,7 @@ runs:
       shell: bash
       run: |
         echo ${{ inputs.registry-password }} | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+        echo ${{ inputs.registry-password }} | podman login ghcr.io -u ${{ github.repository_owner }} --password-stdin
 
     - name: Configure Podman
       shell: bash
@@ -85,7 +86,7 @@ runs:
           -v /var/lib/containers/storage:/var/lib/containers/storage \
           --env-file ${{ steps.create-aws-credentials-file.outputs.CREDENTIALS_FILE }} \
           quay.io/centos-bootc/bootc-image-builder:latest \
-            --type ami \
+            --type ami --rootfs ext4 \
             --aws-ami-name ${{ inputs.ami-name }} \
             --aws-bucket ${{ inputs.aws-output-bucket }} \
             --aws-region ${{ inputs.aws-region }} \
