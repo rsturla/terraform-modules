@@ -21,6 +21,9 @@ on:
       digest:
         description: 'The unique digest of the image'
         value: ${{ jobs.build-oci.outputs.digest }}
+      common-tag:
+        description: 'The common tag used across different builds'
+        value: ${{ jobs.build-oci.outputs.common-tag }}
 
 jobs:
   build-oci:
