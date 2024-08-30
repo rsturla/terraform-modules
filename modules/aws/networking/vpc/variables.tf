@@ -14,6 +14,18 @@ variable "nat_gateway_count" {
   default     = 2
 }
 
+variable "nat_instance_count" {
+  type        = number
+  description = "The number of NAT Instances to create.  If defined, will not create a NAT Gateway"
+  default     = 0
+}
+
+variable "nat_instance_type" {
+  description = "The instance type to use for the NAT Instance"
+  type        = string
+  default     = "t3.micro"
+}
+
 variable "subnet_spacing" {
   description = "The amount of spacing between the different subnet types"
   type        = number
