@@ -1,0 +1,10 @@
+FROM test:local
+
+COPY files/ /
+COPY scripts/ /tmp/scripts/
+
+RUN chmod +x /tmp/scripts/*.sh && \
+  /tmp/scripts/setup.sh && \
+  /tmp/scripts/cleanup.sh \
+  && \
+  bootc container lint
