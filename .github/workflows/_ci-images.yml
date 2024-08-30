@@ -84,7 +84,7 @@ jobs:
       base-image: ${{ needs.build-base.outputs.registry }}@${{ needs.build-base.outputs.digest }}
 
   build-ami:
-    needs: [build-base, build-non-base]
+    needs: [create-matrix, build-non-base]
     strategy:
       fail-fast: false
       matrix:
