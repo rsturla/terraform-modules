@@ -89,24 +89,11 @@ jobs:
           image-tags: ${{ steps.build.outputs.tags }}
           image-registry: ghcr.io/${{ github.repository }}
 
-
-  deploy-oci:
-    runs-on: ubuntu-latest
-    needs: build-oci
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - name: Login to GHCR
-        run: |
-          echo ${{ secrets.GITHUB_TOKEN }} | podman login ghcr.io -u ${{ github.actor }} --password-stdin
-          echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
       - name: Deploy Image
         env:
-          IMAGE_REGISTRY: ${{ needs.build-oci.outputs.registry }}
-          IMAGE_DIGEST: ${{ needs.build-oci.outputs.digest }}
-          IMAGE_UNIQUE_TAG: ${{ needs.build-oci.outputs.unique-tag }}
+          IMAGE_REGISTRY: ${{ steps.push.outputs.registry }}
+          IMAGE_DIGEST: ${{ steps.push.outputs.digest }}
+          IMAGE_UNIQUE_TAG: ${{ steps.generate-metadata.outputs.UNIQUE_TAG }}
         run: |
           if [ ${GITHUB_REF:0:10} = "refs/pull/" ]; then
             PR_NUMBER=$(echo $GITHUB_REF | cut -d'/' -f 3)

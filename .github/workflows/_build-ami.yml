@@ -26,7 +26,7 @@ jobs:
           echo "AMI_NAME=$AMI_NAME" >> $GITHUB_OUTPUT
 
           IMAGE_NAME=$(jq -r '.name' ${{ inputs.image-spec }})
-          IMAGE_REGISTRY=${{ vars.IMAGE_REGISTRY }}/$IMAGE_NAME
+          IMAGE_REGISTRY=ghcr.io/${{ github.repository }}/$IMAGE_NAME
           echo "IMAGE_REGISTRY=$IMAGE_REGISTRY" >> $GITHUB_OUTPUT
 
       - name: Build AMI
@@ -35,7 +35,7 @@ jobs:
         with:
           ami-name: ${{ steps.generate-metadata.outputs.AMI_NAME }}
           image-ref: ${{ steps.generate-metadata.outputs.IMAGE_REGISTRY }}:latest
-          registry: ${{ vars.IMAGE_REGISTRY }}
+          registry: ghcr.io/${{ github.repository }}/$IMAGE_NAME
           registry-password: ${{ secrets.GITHUB_TOKEN }}
           aws-iam-role: ${{ vars.DEPLOY_IAM_ROLE }}
           aws-region: ${{ vars.AWS_REGION }}
