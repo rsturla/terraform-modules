@@ -17,6 +17,7 @@ resource "aws_security_group_rule" "ingress_vpc" {
   to_port           = 0
   protocol          = "-1"
   cidr_blocks       = [data.aws_vpc.this.cidr_block]
+  ipv6_cidr_blocks  = [data.aws_vpc.this.ipv6_cidr_block]
 }
 
 // Allow all egress traffic to the internet
@@ -27,4 +28,5 @@ resource "aws_security_group_rule" "egress_internet" {
   to_port           = 0
   protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
+  ipv6_cidr_blocks  = ["::/0"]
 }

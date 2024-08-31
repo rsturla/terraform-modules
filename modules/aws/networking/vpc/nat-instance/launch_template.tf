@@ -25,10 +25,11 @@ resource "aws_eip" "public_ip" {
 }
 
 resource "aws_launch_template" "this" {
-  name_prefix   = var.name_prefix
-  image_id      = data.aws_ami.this.id
-  instance_type = var.instance_type
-  tags          = var.tags_all
+  name_prefix            = var.name_prefix
+  image_id               = data.aws_ami.this.id
+  instance_type          = var.instance_type
+  tags                   = var.tags_all
+  update_default_version = true
 
   network_interfaces {
     device_index         = 0

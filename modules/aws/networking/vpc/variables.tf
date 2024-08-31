@@ -26,6 +26,12 @@ variable "nat_instance_type" {
   default     = "t3.micro"
 }
 
+variable "nat_instance_ami_id" {
+  description = "The AMI ID to use for the NAT Instance"
+  type        = string
+  default     = null
+}
+
 variable "subnet_spacing" {
   description = "The amount of spacing between the different subnet types"
   type        = number
