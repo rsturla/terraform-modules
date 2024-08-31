@@ -1,4 +1,3 @@
 [[customizations.user]]
 name = "admin"
-password = "bob"
 groups = ["wheel"]

@@ -6,11 +6,11 @@ on:
       image-spec:
         type: string
         required: true
-        description: 'The path to the image.json file'
+        description: "The path to the image.json file"
       image-ref:
         type: string
         required: true
-        description: 'The full reference to the image'
+        description: "The full reference to the image"
 
 jobs:
   build-ami:
@@ -27,7 +27,11 @@ jobs:
         id: generate-metadata
         run: |
           AMI_NAME=$(jq -r '.name' ${{ inputs.image-spec }})-$(date -u +"%Y%m%d%H%M%S")
-          echo "AMI_NAME=$AMI_NAME" >> $GITHUB_OUTPUT
+          if [ ${GITHUB_REF:0:10} = "refs/pull/" ]; then
+            AMI_NAME="pr$GITHUB_HEAD_REF-$AMI_NAME"
+          else
+            echo "AMI_NAME=$AMI_NAME" >> $GITHUB_OUTPUT
+          fi
 
           IMAGE_NAME=$(jq -r '.name' ${{ inputs.image-spec }})
           IMAGE_REGISTRY=ghcr.io/${{ github.repository }}/$IMAGE_NAME
