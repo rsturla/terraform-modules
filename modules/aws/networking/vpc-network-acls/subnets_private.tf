@@ -1,20 +1,52 @@
 locals {
   default_private_nacl_ingress_rules = {
+    DenyRDPFromInternetIPv4 = {
+      from_port   = 3389
+      to_port     = 3389
+      action      = "deny"
+      protocol    = "tcp"
+      cidr_block  = "0.0.0.0/0"
+      rule_number = 896
+    }
+    DenyRDPFromInternetIPv6 = {
+      from_port       = 3389
+      to_port         = 3389
+      action          = "deny"
+      protocol        = "tcp"
+      ipv6_cidr_block = "::/0"
+      rule_number     = 897
+    }
+    DenySSHFromInternetIPv4 = {
+      from_port   = 22
+      to_port     = 22
+      action      = "deny"
+      protocol    = "tcp"
+      cidr_block  = "0.0.0.0/0"
+      rule_number = 898
+    }
+    DenySSHFromInternetIPv6 = {
+      from_port       = 22
+      to_port         = 22
+      action          = "deny"
+      protocol        = "tcp"
+      ipv6_cidr_block = "::/0"
+      rule_number     = 899
+    }
     AllowVPCFromVPCIPv4 = {
       from_port   = 0
       to_port     = 0
       action      = "allow"
       protocol    = "-1"
-      cidr_block  = data.aws_vpc.this.cidr_block
-      rule_number = 898
+      cidr_block  = "0.0.0.0/0"
+      rule_number = 998
     }
     AllowVPCFromVPCIPv6 = {
       from_port       = 0
       to_port         = 0
       action          = "allow"
       protocol        = "-1"
-      ipv6_cidr_block = data.aws_vpc.this.ipv6_cidr_block
-      rule_number     = 899
+      ipv6_cidr_block = "::/0"
+      rule_number     = 999
     }
   }
 

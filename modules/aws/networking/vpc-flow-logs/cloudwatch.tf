@@ -16,6 +16,13 @@ resource "aws_iam_role" "cloudwatch" {
   tags = var.tags_all
 }
 
+resource "aws_iam_role_policy_attachment" "cloudwatch" {
+  count = local.enable_cloudwatch_destination ? 1 : 0
+
+  role       = aws_iam_role.cloudwatch[0].name
+  policy_arn = aws_iam_policy.cloudwatch_iam_policy[0].arn
+}
+
 resource "aws_iam_policy" "cloudwatch_iam_policy" {
   count = local.enable_cloudwatch_destination ? 1 : 0
 
