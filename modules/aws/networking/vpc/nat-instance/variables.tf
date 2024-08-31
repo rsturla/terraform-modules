@@ -21,6 +21,13 @@ variable "subnet_id" {
 variable "ami_id" {
   type        = string
   description = "The AMI ID to use for the NAT Instance."
+  default     = null
+}
+
+variable "ami_name_pattern" {
+  type        = string
+  description = "The pattern to use for selecting the AMI."
+  default     = "aws/images/networking/vpc/nat-instance-*"
 }
 
 variable "instance_type" {

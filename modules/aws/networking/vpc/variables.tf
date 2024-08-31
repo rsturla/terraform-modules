@@ -32,6 +32,12 @@ variable "nat_instance_ami_id" {
   default     = null
 }
 
+variable "nat_instance_ami_name_pattern" {
+  description = "The pattern to use for selecting the AMI"
+  type        = string
+  default     = null
+}
+
 variable "subnet_spacing" {
   description = "The amount of spacing between the different subnet types"
   type        = number

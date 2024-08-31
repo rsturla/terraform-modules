@@ -1,3 +1,20 @@
+resource "aws_network_interface" "this" {
+  subnet_id         = var.subnet_id
+  source_dest_check = false
+  security_groups   = [aws_security_group.this.id]
+  tags              = var.tags_all
+
+  lifecycle {
+    replace_triggered_by = [aws_security_group.this]
+  }
+}
+
+resource "aws_eip" "public_ip" {
+  network_interface = aws_network_interface.this.id
+  domain            = "vpc"
+  tags              = var.tags_all
+}
+
 resource "aws_autoscaling_group" "this" {
   name_prefix      = var.name_prefix
   desired_capacity = 1

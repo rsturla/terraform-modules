@@ -1,31 +1,25 @@
 data "aws_ami" "this" {
   most_recent = true
-  filter {
-    name   = "image-id"
-    values = [var.ami_id]
+  # filter {
+  #   name   = "image-id"
+  #   values = [var.ami_id]
+  # }
+
+  dynamic "filter" {
+    for_each = var.ami_id != null ? [0] : []
+    content {
+      name   = "image-id"
+      values = [var.ami_id]
+    }
   }
-}
 
-locals {
-  image_tags           = data.aws_ami.this.tags
-  bootc_image_registry = lookup(local.image_tags, "bootc-image-registry", null)
-}
-
-resource "aws_network_interface" "this" {
-  subnet_id         = var.subnet_id
-  source_dest_check = false
-  security_groups   = [aws_security_group.this.id]
-  tags              = var.tags_all
-
-  lifecycle {
-    replace_triggered_by = [aws_security_group.this]
+  dynamic "filter" {
+    for_each = var.ami_name_pattern != null ? [0] : []
+    content {
+      name   = "name"
+      values = [var.ami_name_pattern]
+    }
   }
-}
-
-resource "aws_eip" "public_ip" {
-  network_interface = aws_network_interface.this.id
-  domain            = "vpc"
-  tags              = var.tags_all
 }
 
 resource "aws_launch_template" "this" {
