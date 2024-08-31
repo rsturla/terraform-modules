@@ -53,7 +53,7 @@ resource "aws_route" "ipv6_default_gateway" {
 
   route_table_id              = aws_route_table.public[count.index].id
   destination_ipv6_cidr_block = "::/0"
-  egress_only_gateway_id      = aws_egress_only_internet_gateway.this.id
+  gateway_id                  = aws_internet_gateway.this.id
 
   depends_on = [
     aws_internet_gateway.this,
