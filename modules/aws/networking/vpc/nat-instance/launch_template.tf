@@ -16,6 +16,10 @@ resource "aws_network_interface" "this" {
   source_dest_check = false
   security_groups   = [aws_security_group.this.id]
   tags              = var.tags_all
+
+  lifecycle {
+    replace_triggered_by = [aws_security_group.this]
+  }
 }
 
 resource "aws_eip" "public_ip" {

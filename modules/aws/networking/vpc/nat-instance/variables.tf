@@ -26,6 +26,13 @@ variable "ami_id" {
 variable "instance_type" {
   type        = string
   description = "The instance type to use for the NAT Instance."
+  default     = "t3.nano"
+}
+
+variable "use_spot_instance" {
+  type        = bool
+  description = "Whether to use a spot instance for the NAT Instance."
+  default     = true
 }
 
 variable "tags_all" {

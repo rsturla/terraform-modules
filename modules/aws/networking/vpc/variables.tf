@@ -23,7 +23,7 @@ variable "nat_instance_count" {
 variable "nat_instance_type" {
   description = "The instance type to use for the NAT Instance"
   type        = string
-  default     = "t3.micro"
+  default     = "t3.nano"
 }
 
 variable "nat_instance_ami_id" {
@@ -141,7 +141,7 @@ variable "create_vpc_endpoints" {
 variable "flow_log_traffic_type" {
   description = "The type of traffic to capture. Valid values: ACCEPT, REJECT, ALL."
   type        = string
-  default     = "ALL"
+  default     = "REJECT"
 }
 
 variable "flow_log_cloudwatch_log_retention_in_days" {
