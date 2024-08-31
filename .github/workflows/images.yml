@@ -1,7 +1,29 @@
-name: Images CI
+name: Images
 
 on:
-  workflow_call:
+  pull_request:
+    paths:
+      - images/**
+      - .github/workflows/images.yml
+      - .github/workflows/_build-image.yml
+      - .github/actions/build-ami/*
+      - .github/actions/build-image/*
+      - .github/actions/push-image/*
+  push:
+    branches:
+      - main
+    paths:
+      - images/**
+      - .github/workflows/images.yml
+      - .github/workflows/_build-image.yml
+      - .github/workflows/_build-ami.yml
+      - .github/actions/build-ami/*
+      - .github/actions/build-image/*
+      - .github/actions/push-image/*
+  workflow_dispatch:
+  schedule:
+    # Weekly on Tuesday at midnight
+    - cron: "0 0 * * 2"
 
 permissions:
   contents: read
@@ -84,6 +106,7 @@ jobs:
       base-image: ${{ needs.build-base.outputs.registry }}@${{ needs.build-base.outputs.digest }}
 
   build-ami:
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch')
     needs: [create-matrix, build-non-base]
     strategy:
       fail-fast: false
