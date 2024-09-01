@@ -54,6 +54,10 @@ output "nat_gateway_public_ips" {
   value = module.vpc.nat_gateway_public_ips
 }
 
+output "nat_instance_public_ips" {
+  value = module.vpc.nat_instance_public_ips
+}
+
 output "internet_gateway_id" {
   value = module.vpc.internet_gateway_id
 }

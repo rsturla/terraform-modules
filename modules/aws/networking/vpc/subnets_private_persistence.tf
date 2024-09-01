@@ -11,7 +11,8 @@ resource "aws_subnet" "private_persistence" {
     cidrsubnet(var.cidr_block, var.private_persistence_subnet_bits, count.index + local.private_peristence_subnet_spacing),
   )
 
-  enable_dns64 = true
+  enable_dns64                    = true
+  assign_ipv6_address_on_creation = true
   ipv6_cidr_block = lookup(
     var.private_persistence_subnet_ipv6_cidr_blocks,
     "AZ-${count.index}",

@@ -1,0 +1,11 @@
+ARG BASE_IMAGE=ghcr.io/rsturla/terraform-modules/bootc-base:latest
+FROM ${BASE_IMAGE}
+
+COPY files/ /
+COPY scripts/ /tmp/scripts/
+
+RUN chmod +x /tmp/scripts/*.sh && \
+  /tmp/scripts/setup.sh && \
+  /tmp/scripts/cleanup.sh \
+  && \
+  bootc container lint

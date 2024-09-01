@@ -1,0 +1,93 @@
+name: Build AMI
+
+inputs:
+  ami-name:
+    description: 'The name of the AMI to build'
+    required: true
+  image-ref:
+    description: 'The name of the image to build'
+    required: true
+  registry:
+    description: 'The registry to push the AMI to'
+    default: 'ghcr.io/${{ github.repository_owner }}'
+  registry-password:
+    description: 'The password for the registry'
+    required: false
+  aws-iam-role:
+    description: 'The IAM role to assume when publishing the AMI'
+    required: false
+  aws-region:
+    description: 'The region of the registry'
+    required: false
+  aws-output-bucket:
+    description: 'The S3 bucket to store the AMI'
+    required: true
+  osbuild-config-file:
+    description: 'The path to the osbuild config file'
+    required: true
+  osbuild-output-dir:
+    description: 'The path to the osbuild output directory'
+    required: false
+    default: 'outputs'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Login to GHCR
+      id: login-ecr
+      shell: bash
+      run: |
+        echo ${{ inputs.registry-password }} | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+        echo ${{ inputs.registry-password }} | podman login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+
+    - name: Configure Podman
+      shell: bash
+      run: |
+        sudo mkdir -p /etc/containers
+        echo -e "[storage]\ndriver = \"overlay\"\nrunroot = \"/run/containers/storage\"\ngraphroot = \"/var/lib/containers/storage\"" \
+          | sudo tee /etc/containers/storage.conf
+
+    - name: Pull Image
+      shell: bash
+      run: |
+        sudo podman image pull ${{ inputs.image-ref }}
+
+    - name: Configure AWS Credentials
+      id: configure-aws-credentials
+      uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4
+      with:
+        role-to-assume: ${{ inputs.aws-iam-role }}
+        aws-region: ${{ inputs.aws-region }}
+        output-credentials: true
+
+    - name: Create AWS Credentials file
+      id: create-aws-credentials-file
+      shell: bash
+      env:
+        AWS_ACCESS_KEY_ID: ${{ steps.configure-aws-credentials.outputs.aws-access-key-id }}
+        AWS_SECRET_ACCESS_KEY: ${{ steps.configure-aws-credentials.outputs.aws-secret-access-key }}
+        AWS_SESSION_TOKEN: ${{ steps.configure-aws-credentials.outputs.aws-session-token }}
+      run: |
+        echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" > /tmp/aws.env
+        echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> /tmp/aws.env
+        echo "AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN" >> /tmp/aws.env
+        echo "CREDENTIALS_FILE=/tmp/aws.env" >> $GITHUB_OUTPUT
+
+    - name: Build AMI
+      id: build-ami
+      shell: bash
+      run: |
+        mkdir -p $(pwd)/${{ inputs.osbuild-output-dir }}
+        sudo podman run \
+          --rm --privileged \
+          --security-opt label=type:unconfined_t \
+          -v $(pwd)/${{ inputs.osbuild-config-file }}:/config.toml \
+          -v $(pwd)/${{ inputs.osbuild-output-dir }}:/output \
+          -v /var/lib/containers/storage:/var/lib/containers/storage \
+          --env-file ${{ steps.create-aws-credentials-file.outputs.CREDENTIALS_FILE }} \
+          quay.io/centos-bootc/bootc-image-builder:latest \
+            --type ami --rootfs ext4 \
+            --aws-ami-name ${{ inputs.ami-name }} \
+            --aws-bucket ${{ inputs.aws-output-bucket }} \
+            --aws-region ${{ inputs.aws-region }} \
+            --local ${{ inputs.image-ref }}

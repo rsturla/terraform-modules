@@ -1,0 +1,4 @@
+{
+  "name": "aws/images/networking/vpc/nat-instance",
+  "base": false
+}

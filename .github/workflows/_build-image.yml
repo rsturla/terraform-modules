@@ -1,0 +1,107 @@
+name: Build OCI
+
+on:
+  workflow_call:
+    inputs:
+      image-spec:
+        type: string
+        required: true
+        description: 'The path to the image.json file'
+      base-image:
+        type: string
+        required: false
+        description: 'The base image reference'
+    outputs:
+      image-ref:
+        description: 'The unique image reference'
+        value: ${{ jobs.build.outputs.image-ref }}
+      registry:
+        description: 'The registry which stores the image'
+        value: ${{ jobs.build-oci.outputs.registry }}
+      digest:
+        description: 'The unique digest of the image'
+        value: ${{ jobs.build-oci.outputs.digest }}
+      common-tag:
+        description: 'The common tag used across different builds'
+        value: ${{ jobs.build-oci.outputs.common-tag }}
+
+jobs:
+  build-oci:
+    runs-on: ubuntu-latest
+    outputs:
+      registry: ${{ steps.push.outputs.registry }}
+      digest: ${{ steps.push.outputs.digest }}
+      unique-tag: ${{ steps.generate-metadata.outputs.UNIQUE_TAG }}
+      common-tag: ${{ steps.generate-metadata.outputs.SOURCE_TAG }}
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+
+      - name: Generate Image Metadata
+        id: generate-metadata
+        run: |
+          TAGS=()
+          TAGS+=(${GITHUB_SHA::8})
+          DATE_TAG=$(date -u +"%Y%m%d%H%M%S")
+          TAGS+=($DATE_TAG)
+
+          TAGS=$(printf "%s " "${TAGS[@]}")
+          echo "TAGS=$TAGS" >> $GITHUB_OUTPUT
+          echo "UNIQUE_TAG=$DATE_TAG" >> $GITHUB_OUTPUT
+
+          IMAGE_NAME=$(jq -r '.name' ${{ inputs.image-spec }})
+          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_OUTPUT
+          echo "CONTEXT_DIR=$(dirname ${{ inputs.image-spec }})" >> $GITHUB_OUTPUT
+
+          # If a Pull Request and not a base image, use the PR number as the source tag
+          IS_BASE=$(jq -r '.base' ${{ inputs.image-spec }})
+          if [[ ${GITHUB_REF:0:10} = "refs/pull/" && $IS_BASE = "false" ]]; then
+            PR_NUMBER=$(echo $GITHUB_REF | cut -d'/' -f 3)
+            echo "SOURCE_TAG=pr${PR_NUMBER}" >> $GITHUB_OUTPUT
+          else
+            echo "SOURCE_TAG=latest" >> $GITHUB_OUTPUT
+          fi
+          echo "IS_BASE=$IS_BASE" >> $GITHUB_OUTPUT
+
+      - name: Login to GHCR
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | podman login ghcr.io -u ${{ github.actor }} --password-stdin
+          echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build Image
+        id: build
+        uses: ./.github/actions/build-image
+        with:
+          builder: docker
+          context: ${{ steps.generate-metadata.outputs.CONTEXT_DIR }}
+          dockerfile: Containerfile
+          image-name: ${{ steps.generate-metadata.outputs.IMAGE_NAME }}
+          image-tags: ${{ steps.generate-metadata.outputs.TAGS }}
+          build-args: |
+            ${{ inputs.base-image && format('BASE_IMAGE={0}', inputs.base-image) || '' }}
+            SOURCE_TAG=${{ steps.generate-metadata.outputs.SOURCE_TAG }}
+
+      - name: Push Image
+        id: push
+        uses: ./.github/actions/push-image
+        with:
+          builder: docker
+          image-name: ${{ steps.build.outputs.image }}
+          image-tags: ${{ steps.build.outputs.tags }}
+          image-registry: ghcr.io/${{ github.repository }}
+
+      - name: Deploy Image
+        env:
+          IMAGE_REGISTRY: ${{ steps.push.outputs.registry }}
+          IMAGE_DIGEST: ${{ steps.push.outputs.digest }}
+          IMAGE_UNIQUE_TAG: ${{ steps.generate-metadata.outputs.UNIQUE_TAG }}
+        run: |
+          if [ ${GITHUB_REF:0:10} = "refs/pull/" ]; then
+            PR_NUMBER=$(echo $GITHUB_REF | cut -d'/' -f 3)
+            skopeo copy docker://${IMAGE_REGISTRY}@${IMAGE_DIGEST} docker://${IMAGE_REGISTRY}:pr${PR_NUMBER}
+          else
+            skopeo copy docker://${IMAGE_REGISTRY}@${IMAGE_DIGEST} docker://${IMAGE_REGISTRY}:latest
+          fi

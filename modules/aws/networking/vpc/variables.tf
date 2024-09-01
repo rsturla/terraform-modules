@@ -14,6 +14,36 @@ variable "nat_gateway_count" {
   default     = 2
 }
 
+variable "nat_instance_count" {
+  type        = number
+  description = "The number of NAT Instances to create.  If defined, will not create a NAT Gateway"
+  default     = 0
+}
+
+variable "nat_instance_type" {
+  description = "The instance type to use for the NAT Instance"
+  type        = string
+  default     = "t3.nano"
+}
+
+variable "nat_instance_ami_id" {
+  description = "The AMI ID to use for the NAT Instance"
+  type        = string
+  default     = null
+}
+
+variable "nat_instance_ami_name_pattern" {
+  description = "The pattern to use for selecting the AMI"
+  type        = string
+  default     = "aws/images/networking/vpc/nat-instance-*"
+}
+
+variable "nat_instance_ami_owner" {
+  description = "The owner of the AMI"
+  type        = string
+  default     = "self"
+}
+
 variable "subnet_spacing" {
   description = "The amount of spacing between the different subnet types"
   type        = number
@@ -123,7 +153,7 @@ variable "create_vpc_endpoints" {
 variable "flow_log_traffic_type" {
   description = "The type of traffic to capture. Valid values: ACCEPT, REJECT, ALL."
   type        = string
-  default     = "ALL"
+  default     = "REJECT"
 }
 
 variable "flow_log_cloudwatch_log_retention_in_days" {

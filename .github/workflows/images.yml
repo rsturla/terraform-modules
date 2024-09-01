@@ -1,0 +1,118 @@
+name: Images
+
+on:
+  pull_request:
+    paths:
+      - images/**
+      - .github/workflows/images.yml
+      - .github/workflows/_build-image.yml
+      - .github/actions/build-ami/*
+      - .github/actions/build-image/*
+      - .github/actions/push-image/*
+  push:
+    branches:
+      - main
+    paths:
+      - images/**
+      - .github/workflows/images.yml
+      - .github/workflows/_build-image.yml
+      - .github/workflows/_build-ami.yml
+      - .github/actions/build-ami/*
+      - .github/actions/build-image/*
+      - .github/actions/push-image/*
+  workflow_dispatch:
+  schedule:
+    # Weekly on Tuesday at midnight
+    - cron: "0 0 * * 2"
+
+permissions:
+  contents: read
+  id-token: write
+  packages: write
+
+env:
+  REGISTRY: ghcr.io/${{ github.repository }}
+
+jobs:
+  create-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      base-images: ${{ steps.set-matrix.outputs.BASE_IMAGES }}
+      non-base-images: ${{ steps.set-matrix.outputs.NON_BASE_IMAGES }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+
+      - name: Get Image Spec Files
+        id: get-specs
+        run: |
+          IMAGE_SPECS=$(find . -name image.json)
+          IMAGE_SPECS=$(echo $IMAGE_SPECS | sed 's/\.\///g')
+          echo "Found Image Specs: $IMAGE_SPECS"
+
+          BASE_IMAGES=()
+          NON_BASE_IMAGES=()
+          for IMAGE_SPEC in $IMAGE_SPECS; do
+            echo "Processing $IMAGE_SPEC"
+            if jq -e '.base' $IMAGE_SPEC > /dev/null; then
+              echo "Detected base image key in $IMAGE_SPEC"
+              if jq -e '.base == true' $IMAGE_SPEC > /dev/null; then
+                echo "Detected base image in $IMAGE_SPEC"
+                BASE_IMAGES+=($IMAGE_SPEC)
+              else
+                echo "Detected non-base image in $IMAGE_SPEC"
+                NON_BASE_IMAGES+=($IMAGE_SPEC)
+              fi
+            else
+              echo "No base image key in $IMAGE_SPEC"
+              NON_BASE_IMAGES+=($IMAGE_SPEC)
+            fi
+          done
+
+          echo "BASE_IMAGES=${BASE_IMAGES[*]}" >> $GITHUB_OUTPUT
+          echo "NON_BASE_IMAGES=${NON_BASE_IMAGES[*]}" >> $GITHUB_OUTPUT
+
+      - name: Set Matrix
+        id: set-matrix
+        env:
+          BASE_IMAGES: ${{ steps.get-specs.outputs.BASE_IMAGES }}
+          NON_BASE_IMAGES: ${{ steps.get-specs.outputs.NON_BASE_IMAGES }}
+        run: |
+          BASE_IMAGES=$(printf "%s\n" $BASE_IMAGES | jq -R -s -c 'split("\n") | .[:-1]')
+          NON_BASE_IMAGES=$(printf "%s\n" $NON_BASE_IMAGES | jq -R -s -c 'split("\n") | .[:-1]')
+
+          echo "BASE_IMAGES=$BASE_IMAGES" >> $GITHUB_OUTPUT
+          echo "NON_BASE_IMAGES=$NON_BASE_IMAGES" >> $GITHUB_OUTPUT
+
+  build-base:
+    needs: create-matrix
+    strategy:
+      fail-fast: false
+      matrix:
+        base-images: ${{ fromJson(needs.create-matrix.outputs.base-images) }}
+    uses: ./.github/workflows/_build-image.yml
+    with:
+      image-spec: ${{ matrix.base-images }}
+
+  build-non-base:
+    needs: [create-matrix, build-base]
+    strategy:
+      fail-fast: false
+      matrix:
+        non-base-images: ${{ fromJson(needs.create-matrix.outputs.non-base-images) }}
+    uses: ./.github/workflows/_build-image.yml
+    with:
+      image-spec: ${{ matrix.non-base-images }}
+      base-image: ${{ needs.build-base.outputs.registry }}@${{ needs.build-base.outputs.digest }}
+
+  build-ami:
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch')
+    needs: [create-matrix, build-non-base]
+    strategy:
+      fail-fast: false
+      matrix:
+        image-spec: ${{ fromJson(needs.create-matrix.outputs.non-base-images) }}
+    uses: ./.github/workflows/_build-ami.yml
+    with:
+      image-spec: ${{ matrix.image-spec }}
+      image-ref: ${{ needs.build-non-base.outputs.registry }}:${{ needs.build-non-base.outputs.common-tag }}

@@ -1,6 +1,7 @@
 locals {
   private_app_subnet_spacing        = var.private_app_subnet_spacing != null ? var.private_app_subnet_spacing : var.subnet_spacing
   private_peristence_subnet_spacing = var.private_persistence_subnet_spacing != null ? var.private_persistence_subnet_spacing : 2 * var.subnet_spacing
+  is_nat_instance                   = var.nat_instance_count >= 1
 }
 
 data "aws_availability_zones" "all" {}

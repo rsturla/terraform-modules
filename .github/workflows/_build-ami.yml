@@ -1,0 +1,52 @@
+name: Build AMI
+
+on:
+  workflow_call:
+    inputs:
+      image-spec:
+        type: string
+        required: true
+        description: "The path to the image.json file"
+      image-ref:
+        type: string
+        required: true
+        description: "The full reference to the image"
+
+jobs:
+  build-ami:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      packages: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+
+      - name: Generate AMI Metadata
+        id: generate-metadata
+        run: |
+          AMI_NAME=$(jq -r '.name' ${{ inputs.image-spec }})-$(date -u +"%Y%m%d%H%M%S")
+          if [ ${GITHUB_REF:0:10} = "refs/pull/" ]; then
+            AMI_NAME="pr$GITHUB_HEAD_REF-$AMI_NAME"
+          else
+            echo "AMI_NAME=$AMI_NAME" >> $GITHUB_OUTPUT
+          fi
+
+          IMAGE_NAME=$(jq -r '.name' ${{ inputs.image-spec }})
+          IMAGE_REGISTRY=ghcr.io/${{ github.repository }}/$IMAGE_NAME
+          echo "IMAGE_REGISTRY=$IMAGE_REGISTRY" >> $GITHUB_OUTPUT
+
+      - name: Build AMI
+        id: build
+        uses: ./.github/actions/build-ami
+        with:
+          ami-name: ${{ steps.generate-metadata.outputs.AMI_NAME }}
+          image-ref: ${{ inputs.image-ref }}
+          registry: ghcr.io/${{ github.repository }}/$IMAGE_NAME
+          registry-password: ${{ secrets.GITHUB_TOKEN }}
+          aws-iam-role: ${{ vars.DEPLOY_IAM_ROLE }}
+          aws-region: ${{ vars.AWS_REGION }}
+          aws-output-bucket: ${{ vars.AWS_AMI_BUCKET }}
+          osbuild-config-file: ./images/.osbuild/config.toml
+          osbuild-output-dir: /tmp/osbuild-output

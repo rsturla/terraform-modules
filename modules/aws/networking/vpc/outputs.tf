@@ -86,6 +86,13 @@ output "nat_gateway_public_ips" {
   value       = aws_eip.nat[*].public_ip
 }
 
+output "nat_instance_public_ips" {
+  description = "The public IPs of the NAT instances"
+  value = {
+    for instance in module.nat_instance : instance.availability_zone => instance.eip
+  }
+}
+
 output "internet_gateway_id" {
   description = "The ID of the internet gateway"
   value       = aws_internet_gateway.this.id
@@ -95,4 +102,3 @@ output "egress_only_internet_gateway_id" {
   description = "The ID of the egress-only internet gateway"
   value       = aws_egress_only_internet_gateway.this.id
 }
-
