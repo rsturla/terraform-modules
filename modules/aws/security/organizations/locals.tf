@@ -1,6 +1,5 @@
 # Prepare locals so we have a shortcut to the exported properties of the organization
 locals {
-  # The ID of the root of this organization, either from the resource that creates it, or the data source
   root_id = (
     length(aws_organizations_organization.root) > 0
     ? aws_organizations_organization.root[0].roots.0.id
