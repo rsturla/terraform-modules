@@ -30,6 +30,12 @@ variable "ami_name_pattern" {
   default     = "aws/images/networking/vpc/nat-instance-*"
 }
 
+variable "ami_owner" {
+  type        = string
+  description = "The owner of the AMI."
+  default     = "self"
+}
+
 variable "instance_type" {
   type        = string
   description = "The instance type to use for the NAT Instance."

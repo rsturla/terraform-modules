@@ -7,5 +7,7 @@ module "nat_instance" {
   availability_zone = element(data.aws_availability_zones.all.names, count.index)
   subnet_id         = element(aws_subnet.public.*.id, count.index)
   ami_id            = var.nat_instance_ami_id
+  ami_name_pattern  = var.nat_instance_ami_name_pattern
+  ami_owner         = var.nat_instance_ami_owner
   instance_type     = var.nat_instance_type
 }

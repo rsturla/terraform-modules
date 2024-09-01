@@ -35,7 +35,13 @@ variable "nat_instance_ami_id" {
 variable "nat_instance_ami_name_pattern" {
   description = "The pattern to use for selecting the AMI"
   type        = string
-  default     = null
+  default     = "aws/images/networking/vpc/nat-instance-*"
+}
+
+variable "nat_instance_ami_owner" {
+  description = "The owner of the AMI"
+  type        = string
+  default     = "self"
 }
 
 variable "subnet_spacing" {

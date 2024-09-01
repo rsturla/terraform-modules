@@ -1,9 +1,6 @@
 data "aws_ami" "this" {
   most_recent = true
-  # filter {
-  #   name   = "image-id"
-  #   values = [var.ami_id]
-  # }
+  owners      = [var.ami_owner]
 
   dynamic "filter" {
     for_each = var.ami_id != null ? [0] : []
@@ -14,7 +11,7 @@ data "aws_ami" "this" {
   }
 
   dynamic "filter" {
-    for_each = var.ami_name_pattern != null ? [0] : []
+    for_each = var.ami_name_pattern != null && var.ami_id == null ? [0] : []
     content {
       name   = "name"
       values = [var.ami_name_pattern]
