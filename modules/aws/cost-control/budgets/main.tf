@@ -62,6 +62,7 @@ resource "aws_budgets_budget" "this" {
 resource "aws_sns_topic" "notifications" {
   count = var.sns_topic_name != null && length(var.notifications) > 0 ? 1 : 0
   name  = var.sns_topic_name
+  tags  = var.tags_all
 }
 
 resource "aws_sns_topic_policy" "notifications" {
