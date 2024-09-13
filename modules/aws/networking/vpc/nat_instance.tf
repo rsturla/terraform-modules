@@ -10,4 +10,8 @@ module "nat_instance" {
   ami_name_pattern  = var.nat_instance_ami_name_pattern
   ami_owner         = var.nat_instance_ami_owner
   instance_type     = var.nat_instance_type
+
+  schedule_time_zone      = var.nat_instance_schedule_time_zone
+  schedule_power_on_cron  = var.nat_instance_schedule_power_on_cron
+  schedule_power_off_cron = var.nat_instance_schedule_power_off_cron
 }

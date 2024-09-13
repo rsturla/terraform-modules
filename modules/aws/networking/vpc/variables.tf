@@ -44,6 +44,24 @@ variable "nat_instance_ami_owner" {
   default     = "self"
 }
 
+variable "nat_instance_schedule_time_zone" {
+  description = "The time zone for the scheduled action"
+  type        = string
+  default     = "Europe/London"
+}
+
+variable "nat_instance_schedule_power_on_cron" {
+  description = "The cron expression for the power on schedule"
+  type        = string
+  default     = ""
+}
+
+variable "nat_instance_schedule_power_off_cron" {
+  description = "The cron expression for the power off schedule"
+  type        = string
+  default     = ""
+}
+
 variable "subnet_spacing" {
   description = "The amount of spacing between the different subnet types"
   type        = number

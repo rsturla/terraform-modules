@@ -18,8 +18,8 @@ resource "aws_eip" "public_ip" {
 resource "aws_autoscaling_group" "this" {
   name_prefix      = var.name_prefix
   desired_capacity = 1
-  max_size         = 2
-  min_size         = 1
+  max_size         = 1
+  min_size         = 0
 
   // Since a Network Interface cannot span multiple Availability Zones, we need to hard-code the Availability Zone
   availability_zones = [var.availability_zone]
@@ -57,4 +57,26 @@ resource "aws_autoscaling_group" "this" {
       }
     }
   }
+
+  lifecycle {
+    ignore_changes = [desired_capacity]
+  }
+}
+
+resource "aws_autoscaling_schedule" "power_on" {
+  count                  = var.schedule_power_on_cron != "" ? 1 : 0
+  scheduled_action_name  = "power-on"
+  autoscaling_group_name = aws_autoscaling_group.this.name
+  desired_capacity       = 1
+  time_zone              = var.schedule_time_zone
+  recurrence             = var.schedule_power_on_cron
+}
+
+resource "aws_autoscaling_schedule" "power_off" {
+  count                  = var.schedule_power_off_cron != "" ? 1 : 0
+  scheduled_action_name  = "power-off"
+  autoscaling_group_name = aws_autoscaling_group.this.name
+  desired_capacity       = 0
+  time_zone              = var.schedule_time_zone
+  recurrence             = var.schedule_power_off_cron
 }
