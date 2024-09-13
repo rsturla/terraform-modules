@@ -48,6 +48,24 @@ variable "use_spot_instance" {
   default     = true
 }
 
+variable "schedule_time_zone" {
+  description = "The time zone for the scheduled action"
+  type        = string
+  default     = "Europe/London"
+}
+
+variable "schedule_power_on_cron" {
+  description = "The cron expression for the power on schedule"
+  type        = string
+  default     = ""
+}
+
+variable "schedule_power_off_cron" {
+  description = "The cron expression for the power off schedule"
+  type        = string
+  default     = ""
+}
+
 variable "tags_all" {
   description = "A map of tags to assign to all resources created by this module"
   type        = map(string)
