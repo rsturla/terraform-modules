@@ -17,7 +17,7 @@ resource "aws_eip" "public_ip" {
 
 resource "aws_autoscaling_group" "this" {
   name_prefix      = var.name_prefix
-  desired_capacity = var.schedule_power_on_cron != "" || var.schedule_power_off_cron != "" ? null : 1
+  desired_capacity = 1
   max_size         = 1
   min_size         = 0
 
@@ -57,6 +57,10 @@ resource "aws_autoscaling_group" "this" {
       }
     }
   }
+
+  lifecycle {
+    ignore_changes = [desired_capacity]
+  }
 }
 
 resource "aws_autoscaling_schedule" "power_on" {
@@ -64,8 +68,6 @@ resource "aws_autoscaling_schedule" "power_on" {
   scheduled_action_name  = "power-on"
   autoscaling_group_name = aws_autoscaling_group.this.name
   desired_capacity       = 1
-  max_size               = 1
-  min_size               = 1
   time_zone              = var.schedule_time_zone
   recurrence             = var.schedule_power_on_cron
 }
@@ -75,8 +77,6 @@ resource "aws_autoscaling_schedule" "power_off" {
   scheduled_action_name  = "power-off"
   autoscaling_group_name = aws_autoscaling_group.this.name
   desired_capacity       = 0
-  max_size               = 1
-  min_size               = 0
   time_zone              = var.schedule_time_zone
   recurrence             = var.schedule_power_off_cron
 }
