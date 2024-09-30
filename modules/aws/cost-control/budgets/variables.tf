@@ -30,10 +30,10 @@ variable "budgets" {
       include_upfront            = false
       use_blended                = false
     })
-    cost_filter = list(object({
+    cost_filter = optional(list(object({
       name   = string
       values = list(string)
-    }))
+    })), [])
     tags = optional(map(string), {})
   }))
   default = {}
