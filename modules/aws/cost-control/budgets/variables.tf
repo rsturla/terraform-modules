@@ -33,7 +33,7 @@ variable "budgets" {
     cost_filter = optional(list(object({
       name   = string
       values = list(string)
-    })), null)
+    })), [])
     tags = optional(map(string), {})
   }))
   default = {}
