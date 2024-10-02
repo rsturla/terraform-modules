@@ -9,6 +9,12 @@ variable "description" {
   default     = null
 }
 
+variable "capabilities" {
+  description = "A list of capabilities to pass to the stackset"
+  type        = list(string)
+  default     = ["CAPABILITY_IAM", "CAPABILITY_NAMED_IAM"]
+}
+
 variable "template" {
   description = "The template body"
   type        = string
