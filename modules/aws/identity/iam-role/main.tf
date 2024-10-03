@@ -4,27 +4,29 @@ resource "aws_iam_role" "this" {
 }
 
 data "aws_iam_policy_document" "assume_role" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "sts:AssumeRoleWithWebIdentity"
-    ]
+  dynamic "statement" {
+    for_each = var.assume_role_statements
+    content {
+      sid     = statement.key
+      effect  = lookup(statement.value, "effect", "Allow")
+      actions = lookup(statement.value, "actions", null)
 
-    condition {
-      test     = "StringLike"
-      values   = ["repo:${var.repository}:${var.git_pattern}"]
-      variable = "token.actions.githubusercontent.com:sub"
-    }
+      dynamic "condition" {
+        for_each = lookup(statement.value, "condition", {})
+        content {
+          test     = condition.value.test
+          variable = condition.value.variable
+          values   = condition.value.values
+        }
+      }
 
-    condition {
-      test     = "StringEquals"
-      values   = ["sts.amazonaws.com"]
-      variable = "token.actions.githubusercontent.com:aud"
-    }
-
-    principals {
-      type        = "Federated"
-      identifiers = [var.create_openid_connect_provider ? aws_iam_openid_connect_provider.github[0].arn : data.aws_iam_openid_connect_provider.github[0].arn]
+      dynamic "principals" {
+        for_each = lookup(statement.value, "principals", {})
+        content {
+          type        = principals.value.type
+          identifiers = principals.value.identifiers
+        }
+      }
     }
   }
 }
