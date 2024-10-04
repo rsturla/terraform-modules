@@ -24,3 +24,9 @@ variable "policy_arns" {
   type        = list(string)
   default     = []
 }
+
+variable "policy_statements" {
+  description = "The IAM policy to attach to the role"
+  type        = any
+  default     = {}
+}
