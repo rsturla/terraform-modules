@@ -50,9 +50,3 @@ variable "target_org_units" {
   type        = list(string)
   default     = []
 }
-
-variable "auto_deployment_enabled" {
-  description = "Whether to automatically deploy to new accounts or organization units"
-  type        = bool
-  default     = false
-}

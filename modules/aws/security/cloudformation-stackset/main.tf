@@ -8,11 +8,8 @@ resource "aws_cloudformation_stack_set" "this" {
   template_url  = var.template_url
   parameters    = var.parameters
 
-  dynamic "auto_deployment" {
-    for_each = var.auto_deployment_enabled ? [true] : []
-    content {
-      enabled = true
-    }
+  auto_deployment {
+    enabled = true
   }
 
   tags = var.tags_all
