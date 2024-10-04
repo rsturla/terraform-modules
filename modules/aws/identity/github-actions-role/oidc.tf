@@ -1,6 +1,6 @@
 data "aws_iam_openid_connect_provider" "github" {
   count = var.create_openid_connect_provider ? 0 : 1
-  url   = "https://token.actions.githubusercontent.com"
+  arn   = "arn:aws:iam::${data.aws_caller_identity.account_id}:oidc-provider/token.actions.githubusercontent.com"
 }
 
 data "tls_certificate" "github" {
