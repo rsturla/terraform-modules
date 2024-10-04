@@ -15,7 +15,7 @@ variable "capabilities" {
   default     = ["CAPABILITY_IAM", "CAPABILITY_NAMED_IAM"]
 }
 
-variable "template" {
+variable "template_body" {
   description = "The template body"
   type        = string
   default     = null

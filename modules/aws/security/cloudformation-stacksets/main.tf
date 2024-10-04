@@ -4,7 +4,7 @@ resource "aws_cloudformation_stack_set" "this" {
   capabilities     = var.capabilities
   permission_model = "SERVICE_MANAGED"
 
-  template_body = var.template
+  template_body = var.template_body
   template_url  = var.template_url
   parameters    = var.parameters
 
