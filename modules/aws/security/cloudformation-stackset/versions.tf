@@ -1,5 +1,3 @@
-# This file is generated. Do not edit! Your changes will be lost.
-
 terraform {
   required_version = ">=1.3"
 
