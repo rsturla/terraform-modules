@@ -16,7 +16,7 @@ resource "aws_ssoadmin_account_assignment" "account_assignment" {
 
   principal_type = each.value.principal_type
 
-  principal_id = aws_identitystore_group.sso_groups[each.value.principal_name].id
+  principal_id = aws_identitystore_group.sso_groups[each.value.principal_name].group_id
 
   target_id   = each.value.account_id
   target_type = "AWS_ACCOUNT"
