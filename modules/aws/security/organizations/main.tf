@@ -19,7 +19,7 @@ resource "aws_organizations_account" "child_accounts" {
   email = each.value["email"]
 
   close_on_deletion          = lookup(each.value, "close_on_deletion", false)
-  iam_user_access_to_billing = lookup(each.value, "iam_user_access_to_billing", var.default_iam_user_access_to_billing)
+  iam_user_access_to_billing = lookup(each.value, "iam_user_access_to_billing", var.default_iam_user_access_to_billing) ? "ALLOW" : "DENY"
   role_name                  = lookup(each.value, "role_name", var.default_role_name)
   tags                       = merge(var.tags_all, lookup(each.value, "tags", {}))
 
