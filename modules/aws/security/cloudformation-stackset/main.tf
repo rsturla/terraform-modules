@@ -15,7 +15,7 @@ resource "aws_cloudformation_stack_set" "this" {
   tags = var.tags_all
 
   lifecycle {
-    ignore_changes = [ administration_role_arn ]
+    ignore_changes = [administration_role_arn]
   }
 }
 
