@@ -16,6 +16,12 @@ variable "organizations_enabled_policy_types" {
   default     = []
 }
 
+variable "organizations_delegated_administrators" {
+  description = "The accounts to designate as delegated administrators in the organization"
+  type        = map(string)
+  default     = {}
+}
+
 variable "organizations_feature_set" {
   description = "The feature set to enable in the organization"
   type        = string
