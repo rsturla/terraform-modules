@@ -13,6 +13,10 @@ resource "aws_cloudformation_stack_set" "this" {
   }
 
   tags = var.tags_all
+
+  lifecycle {
+    ignore_changes = [ administration_role_arn ]
+  }
 }
 
 resource "aws_cloudformation_stack_set_instance" "accounts" {
