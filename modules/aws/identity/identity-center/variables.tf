@@ -1,7 +1,7 @@
 variable "sso_groups" {
   description = "Names of the groups you wish to create in IAM Identity Center."
-  type = map(string)
-  default = {}
+  type        = map(string)
+  default     = {}
 }
 
 variable "permission_sets" {

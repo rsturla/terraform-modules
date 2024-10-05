@@ -33,6 +33,6 @@ resource "aws_organizations_account" "child_accounts" {
 resource "aws_organizations_delegated_administrator" "delegated_administrators" {
   for_each = var.organizations_delegated_administrators
 
-  account_id = each.value
+  account_id        = each.value
   service_principal = each.key
 }

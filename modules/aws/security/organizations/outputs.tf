@@ -35,5 +35,5 @@ output "child_account_ids" {
   value = {
     for account in aws_organizations_account.child_accounts : account.name => account.id
   }
-  sensitive   = true
+  sensitive = true
 }
