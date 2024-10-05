@@ -5,13 +5,13 @@ variable "sso_groups" {
 }
 
 variable "permission_sets" {
-  description = "Permission Sets that you wish to create in IAM Identity Center. This variable is a map of maps containing Permission Set names as keys. See permission_sets description in README for information about map values."
+  description = "Permission Sets that you wish to create in IAM Identity Center. This variable is a map of maps containing Permission Set names as keys."
   type        = any
   default     = {}
 }
 
 variable "account_assignments" {
-  description = "List of maps containing mapping between user/group, permission set and assigned accounts list. See account_assignments description in README for more information about map values."
+  description = "List of maps containing mapping between user/group, permission set and assigned accounts list."
   type = map(object({
     principal_name  = string
     principal_type  = optional(string, "GROUP")
