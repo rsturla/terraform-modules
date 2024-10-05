@@ -5,7 +5,7 @@ resource "aws_identitystore_group" "sso_groups" {
   for_each          = var.sso_groups == null ? {} : var.sso_groups
   identity_store_id = local.sso_instance_id
   display_name      = each.key
-  description       = each.value.description
+  description       = each.value
 }
 
 resource "aws_ssoadmin_account_assignment" "account_assignment" {
