@@ -1,9 +1,6 @@
 variable "sso_groups" {
   description = "Names of the groups you wish to create in IAM Identity Center."
-  type = map(object({
-    group_name        = string
-    group_description = optional(string, null)
-  }))
+  type = map(string)
   default = {}
 }
 

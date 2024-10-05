@@ -4,8 +4,8 @@ data "aws_organizations_organization" "organization" {}
 resource "aws_identitystore_group" "sso_groups" {
   for_each          = var.sso_groups == null ? {} : var.sso_groups
   identity_store_id = local.sso_instance_id
-  display_name      = each.value.group_name
-  description       = each.value.group_description
+  display_name      = each.key
+  description       = each.value.description
 }
 
 resource "aws_ssoadmin_account_assignment" "account_assignment" {
@@ -16,7 +16,7 @@ resource "aws_ssoadmin_account_assignment" "account_assignment" {
 
   principal_type = each.value.principal_type
 
-  principal_id = aws_identitystore_group.sso_groups[each.value.principal_name].group_id
+  principal_id = aws_identitystore_group.sso_groups[each.value.principal_name].id
 
   target_id   = each.value.account_id
   target_type = "AWS_ACCOUNT"
