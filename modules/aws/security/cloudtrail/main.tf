@@ -7,7 +7,7 @@ resource "aws_cloudtrail_organization_delegated_admin_account" "this" {
 }
 
 resource "aws_cloudtrail" "this" {
-  count = var.is_organization_management_account ? 1 : 0
+  count = var.is_organization_management_account ? 0 : 1
   name  = var.name
 
   s3_bucket_name = var.create_s3_bucket ? aws_s3_bucket.bucket[0].bucket : var.s3_bucket_name
