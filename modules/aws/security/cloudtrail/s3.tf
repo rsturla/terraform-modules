@@ -76,6 +76,10 @@ data "aws_iam_policy_document" "config_bucket_policy" {
       aws_s3_bucket.bucket[0].arn,
       "${aws_s3_bucket.bucket[0].arn}/AWSLogs/*",
     ]
+    principals {
+      type        = "Service"
+      identifiers = ["cloudtrail.amazonaws.com"]
+    }
     condition {
       test     = "StringEquals"
       variable = "s3:x-amz-acl"
