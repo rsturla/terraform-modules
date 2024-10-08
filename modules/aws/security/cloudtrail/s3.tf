@@ -60,6 +60,9 @@ data "aws_iam_policy_document" "config_bucket_policy" {
     actions = [
       "s3:GetBucketAcl",
     ]
+    resources = [
+      aws_s3_bucket.bucket[0].arn,
+    ]
     principals {
       type        = "Service"
       identifiers = ["cloudtrail.amazonaws.com"]
