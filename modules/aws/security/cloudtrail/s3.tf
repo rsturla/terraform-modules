@@ -1,12 +1,16 @@
+locals {
+  create_s3_bucket = var.create_s3_bucket && !var.is_organization_management_account ? true : false
+}
+
 resource "aws_s3_bucket" "bucket" {
-  count = var.create_s3_bucket ? 1 : 0
+  count = local.create_s3_bucket ? 1 : 0
 
   bucket        = var.s3_bucket_name
   bucket_prefix = var.s3_bucket_name_prefix
 }
 
 resource "aws_s3_bucket_public_access_block" "bucket" {
-  count = var.create_s3_bucket ? 1 : 0
+  count = local.create_s3_bucket ? 1 : 0
 
   bucket = aws_s3_bucket.bucket[0].id
 
@@ -17,7 +21,7 @@ resource "aws_s3_bucket_public_access_block" "bucket" {
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "bucket" {
-  count = var.create_s3_bucket ? 1 : 0
+  count = local.create_s3_bucket ? 1 : 0
 
   bucket = aws_s3_bucket.bucket[0].id
 
@@ -29,7 +33,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "bucket" {
 }
 
 resource "aws_s3_bucket_versioning" "bucket" {
-  count = var.create_s3_bucket ? 1 : 0
+  count = local.create_s3_bucket ? 1 : 0
 
   bucket = aws_s3_bucket.bucket[0].id
 
@@ -39,7 +43,7 @@ resource "aws_s3_bucket_versioning" "bucket" {
 }
 
 resource "aws_s3_bucket_policy" "bucket_policy" {
-  count = var.create_s3_bucket ? 1 : 0
+  count = local.create_s3_bucket ? 1 : 0
 
   bucket = aws_s3_bucket.bucket[0].id
   policy = data.aws_iam_policy_document.config_bucket_policy[0].json
@@ -48,7 +52,7 @@ resource "aws_s3_bucket_policy" "bucket_policy" {
 }
 
 data "aws_iam_policy_document" "config_bucket_policy" {
-  count = var.create_s3_bucket ? 1 : 0
+  count = local.create_s3_bucket ? 1 : 0
 
   statement {
     sid     = "AllowTLSRequestsOnly"
@@ -71,7 +75,7 @@ data "aws_iam_policy_document" "config_bucket_policy" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "bucket" {
-  count = var.create_s3_bucket ? 1 : 0
+  count = local.create_s3_bucket ? 1 : 0
 
   bucket = aws_s3_bucket.bucket[0].id
 
