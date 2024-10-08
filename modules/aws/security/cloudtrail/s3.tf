@@ -55,6 +55,35 @@ data "aws_iam_policy_document" "config_bucket_policy" {
   count = local.create_s3_bucket ? 1 : 0
 
   statement {
+    sid    = "AllowCloudTrailCheckAcl"
+    effect = "Allow"
+    actions = [
+      "s3:GetBucketAcl",
+    ]
+    principals {
+      type        = "Service"
+      identifiers = ["cloudtrail.amazonaws.com"]
+    }
+  }
+
+  statement {
+    sid    = "AllowCloudTrailWrite"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+    ]
+    resources = [
+      aws_s3_bucket.bucket[0].arn,
+      "${aws_s3_bucket.bucket[0].arn}/AWSLogs/*",
+    ]
+    condition {
+      test     = "StringEquals"
+      variable = "s3:x-amz-acl"
+      values   = ["bucket-owner-full-control"]
+    }
+  }
+
+  statement {
     sid     = "AllowTLSRequestsOnly"
     effect  = "Deny"
     actions = ["s3:*"]
