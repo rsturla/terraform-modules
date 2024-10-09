@@ -51,6 +51,14 @@ data "aws_iam_policy_document" "config_bucket_policy" {
       type        = "Service"
       identifiers = ["cloudtrail.amazonaws.com"]
     }
+    dynamic "condition" {
+      for_each = var.cloudtrail_arn != null ? [1] : []
+      content {
+        test     = "StringEquals"
+        variable = "aws:SourceArn"
+        values   = [var.cloudtrail_arn]
+      }
+    }
   }
 
   statement {
@@ -71,6 +79,14 @@ data "aws_iam_policy_document" "config_bucket_policy" {
       test     = "StringEquals"
       variable = "s3:x-amz-acl"
       values   = ["bucket-owner-full-control"]
+    }
+    dynamic "condition" {
+      for_each = var.cloudtrail_arn != null ? [1] : []
+      content {
+        test     = "StringEquals"
+        variable = "aws:SourceArn"
+        values   = [var.cloudtrail_arn]
+      }
     }
   }
 

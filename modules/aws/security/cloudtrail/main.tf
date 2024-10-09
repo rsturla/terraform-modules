@@ -1,4 +1,5 @@
 data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
 
 locals {
   is_delegated_administrator_account = var.delegated_administrator_account_id == data.aws_caller_identity.current.account_id
@@ -87,4 +88,6 @@ module "bucket" {
   bucket_name        = var.s3_bucket_name
   bucket_name_prefix = var.s3_bucket_name_prefix
   lifecycle_prefix   = var.s3_key_prefix
+
+  cloudtrail_arn = "arn:aws:cloudtrail:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:trail/${var.name}"
 }

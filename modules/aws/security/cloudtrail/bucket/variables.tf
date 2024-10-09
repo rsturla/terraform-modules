@@ -33,3 +33,9 @@ variable "expiration_days" {
   description = "The number of days to wait before permanently deleting objects.  Defaults to 10 years."
   default     = 3650
 }
+
+variable "cloudtrail_arn" {
+  description = "The ARN of the CloudTrail to allow access to the bucket"
+  type        = string
+  default     = null
+}
