@@ -1,11 +1,11 @@
 output "name" {
   description = "The name of the CloudTrail Trail."
-  value       = aws_cloudtrail.this[0].name
+  value       = try(aws_cloudtrail.this[0].name, null)
 }
 
 output "arn" {
   description = "The ARN of the CloudTrail Trail."
-  value       = aws_cloudtrail.this[0].arn
+  value       = try(aws_cloudtrail.this[0].arn, null)
 }
 
 output "bucket_name" {
