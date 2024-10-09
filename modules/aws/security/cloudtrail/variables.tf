@@ -22,12 +22,6 @@ variable "include_global_service_events" {
   default     = true
 }
 
-variable "enable_log_file_validation" {
-  description = "Specifies whether log file integrity validation is enabled."
-  type        = bool
-  default     = true
-}
-
 variable "create_s3_bucket" {
   description = "Whether to create the S3 bucket or use an existing one."
   type        = bool

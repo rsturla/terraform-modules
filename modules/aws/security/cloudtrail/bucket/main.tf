@@ -1,18 +1,10 @@
-locals {
-  create_s3_bucket = var.create_s3_bucket && !var.is_organization_management_account ? true : false
-}
-
 resource "aws_s3_bucket" "bucket" {
-  count = local.create_s3_bucket ? 1 : 0
-
-  bucket        = var.s3_bucket_name
-  bucket_prefix = var.s3_bucket_name_prefix
+  bucket        = var.bucket_name
+  bucket_prefix = var.bucket_name_prefix
 }
 
 resource "aws_s3_bucket_public_access_block" "bucket" {
-  count = local.create_s3_bucket ? 1 : 0
-
-  bucket = aws_s3_bucket.bucket[0].id
+  bucket = aws_s3_bucket.bucket.id
 
   block_public_acls       = true
   block_public_policy     = true
@@ -21,9 +13,7 @@ resource "aws_s3_bucket_public_access_block" "bucket" {
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "bucket" {
-  count = local.create_s3_bucket ? 1 : 0
-
-  bucket = aws_s3_bucket.bucket[0].id
+  bucket = aws_s3_bucket.bucket.id
 
   rule {
     apply_server_side_encryption_by_default {
@@ -33,9 +23,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "bucket" {
 }
 
 resource "aws_s3_bucket_versioning" "bucket" {
-  count = local.create_s3_bucket ? 1 : 0
-
-  bucket = aws_s3_bucket.bucket[0].id
+  bucket = aws_s3_bucket.bucket.id
 
   versioning_configuration {
     status = "Enabled"
@@ -43,17 +31,13 @@ resource "aws_s3_bucket_versioning" "bucket" {
 }
 
 resource "aws_s3_bucket_policy" "bucket_policy" {
-  count = local.create_s3_bucket ? 1 : 0
-
-  bucket = aws_s3_bucket.bucket[0].id
-  policy = data.aws_iam_policy_document.config_bucket_policy[0].json
+  bucket = aws_s3_bucket.bucket.id
+  policy = data.aws_iam_policy_document.config_bucket_policy.json
 
   depends_on = [aws_s3_bucket_public_access_block.bucket]
 }
 
 data "aws_iam_policy_document" "config_bucket_policy" {
-  count = local.create_s3_bucket ? 1 : 0
-
   statement {
     sid    = "AllowCloudTrailCheckAcl"
     effect = "Allow"
@@ -61,7 +45,7 @@ data "aws_iam_policy_document" "config_bucket_policy" {
       "s3:GetBucketAcl",
     ]
     resources = [
-      aws_s3_bucket.bucket[0].arn,
+      aws_s3_bucket.bucket.arn,
     ]
     principals {
       type        = "Service"
@@ -76,8 +60,8 @@ data "aws_iam_policy_document" "config_bucket_policy" {
       "s3:PutObject",
     ]
     resources = [
-      aws_s3_bucket.bucket[0].arn,
-      "${aws_s3_bucket.bucket[0].arn}/AWSLogs/*",
+      aws_s3_bucket.bucket.arn,
+      "${aws_s3_bucket.bucket.arn}/AWSLogs/*",
     ]
     principals {
       type        = "Service"
@@ -95,8 +79,8 @@ data "aws_iam_policy_document" "config_bucket_policy" {
     effect  = "Deny"
     actions = ["s3:*"]
     resources = [
-      aws_s3_bucket.bucket[0].arn,
-      "${aws_s3_bucket.bucket[0].arn}/*"
+      aws_s3_bucket.bucket.arn,
+      "${aws_s3_bucket.bucket.arn}/*"
     ]
     principals {
       type        = "*"
@@ -111,15 +95,67 @@ data "aws_iam_policy_document" "config_bucket_policy" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "bucket" {
-  count = local.create_s3_bucket ? 1 : 0
+  bucket = aws_s3_bucket.bucket.id
 
-  bucket = aws_s3_bucket.bucket[0].id
+  dynamic "rule" {
+    for_each = var.infrequent_access_transition_days != null ? [1] : []
+
+    content {
+      id     = "transition-to-standard-ia"
+      status = "Enabled"
+
+      transition {
+        days          = var.infrequent_access_transition_days
+        storage_class = "STANDARD_IA"
+      }
+
+      filter {
+        prefix = var.lifecycle_prefix
+      }
+    }
+  }
+
+  dynamic "rule" {
+    for_each = var.glacier_transition_days != null ? [1] : []
+
+    content {
+      id     = "transition-to-glacier"
+      status = "Enabled"
+
+      transition {
+        days          = var.glacier_transition_days
+        storage_class = "GLACIER"
+      }
+
+      filter {
+        prefix = var.lifecycle_prefix
+      }
+    }
+  }
+
+  rule {
+    id     = "expire-objects"
+    status = "Enabled"
+
+    expiration {
+      days = var.expiration_days
+    }
+
+    filter {
+      prefix = var.lifecycle_prefix
+    }
+  }
 
   rule {
     id     = "abort-incomplete-multipart-uploads"
     status = "Enabled"
+
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
+    }
+
+    filter {
+      prefix = var.lifecycle_prefix
     }
   }
 }
