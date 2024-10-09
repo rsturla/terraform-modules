@@ -10,10 +10,10 @@ output "arn" {
 
 output "bucket_name" {
   description = "The name of the S3 bucket to which CloudTrail logs will be delivered."
-  value       = module.bucket[0].name
+  value       = try(module.bucket[0].bucket_name, null)
 }
 
 output "bucket_arn" {
   description = "The ARN of the S3 bucket to which CloudTrail logs will be delivered."
-  value       = module.bucket[0].arn
+  value       = try(module.bucket[0].arn, null)
 }
