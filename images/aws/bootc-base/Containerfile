@@ -1,4 +1,4 @@
-FROM quay.io/centos-bootc/centos-bootc:stream9
+FROM quay.io/centos-bootc/centos-bootc:stream9@sha256:277f5ffdc082140e97c19e8f1bc8a8a02a9939f47669f10e438dc07ace7edccd
 
 COPY files/ /
 COPY scripts/ /tmp/scripts/
