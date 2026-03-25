@@ -105,7 +105,7 @@ resource "aws_cloudfront_function" "robots_txt" {
           "content-type": { value: "text/plain" },
           "cache-control": { value: "public, max-age=86400" }
         },
-        body: "User-agent: *\\nDisallow: /\\n"
+        body: "User-agent: *\nDisallow: /\n"
       };
     }
   JS
