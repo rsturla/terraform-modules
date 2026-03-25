@@ -1,5 +1,5 @@
 locals {
-  source_urls = merge([
+  source_urls = var.manage_dns ? merge([
     for rewrite_key, rewrite_value in local.rewrites : {
       for source_domain in rewrite_value.source_domains :
       source_domain => {
@@ -7,7 +7,7 @@ locals {
         hosted_zone_name = rewrite_value.hosted_zone_name
       }
     }
-  ]...)
+  ]...) : {}
 }
 
 resource "aws_route53_record" "record" {

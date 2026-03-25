@@ -1,5 +1,5 @@
 data "aws_route53_zone" "zone" {
-  for_each = local.rewrites
+  for_each = var.manage_dns ? local.rewrites : {}
 
   name = each.value.hosted_zone_name
 }
@@ -39,6 +39,31 @@ resource "aws_cloudfront_distribution" "distribution" {
     }
   }
 
+  dynamic "ordered_cache_behavior" {
+    for_each = var.robots_txt_disallow ? [1] : []
+
+    content {
+      path_pattern           = "/robots.txt"
+      allowed_methods        = ["GET", "HEAD"]
+      cached_methods         = ["GET", "HEAD"]
+      target_origin_id       = each.key
+      viewer_protocol_policy = "redirect-to-https"
+      compress               = false
+
+      forwarded_values {
+        query_string = false
+        cookies {
+          forward = "none"
+        }
+      }
+
+      function_association {
+        event_type   = "viewer-request"
+        function_arn = aws_cloudfront_function.robots_txt[each.key].arn
+      }
+    }
+  }
+
   default_cache_behavior {
     allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     cached_methods         = ["GET", "HEAD"]
@@ -62,4 +87,30 @@ resource "aws_cloudfront_distribution" "distribution" {
   }
 
   tags = var.tags_all
+}
+
+resource "aws_cloudfront_function" "robots_txt" {
+  for_each = var.robots_txt_disallow ? local.rewrites : {}
+
+  name    = "${each.key}-robots-txt"
+  comment = "Serve robots.txt disallowing all crawlers for ${each.key}"
+  runtime = "cloudfront-js-1.0"
+
+  code = <<-JS
+    function handler(event) {
+      return {
+        statusCode: 200,
+        statusDescription: "OK",
+        headers: {
+          "content-type": { value: "text/plain" },
+          "cache-control": { value: "public, max-age=86400" }
+        },
+        body: "User-agent: *\\nDisallow: /\\n"
+      };
+    }
+  JS
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
